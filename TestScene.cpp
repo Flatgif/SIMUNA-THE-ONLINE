@@ -1,4 +1,7 @@
 #include "TestScene.h"
+#include "Player.h"
+#include "Enemy.h"
+#include "Map.h"
 
 //コンストラクタ
 TestScene::TestScene(GameObject * parent)
@@ -9,6 +12,9 @@ TestScene::TestScene(GameObject * parent)
 //初期化
 void TestScene::Initialize()
 {
+	Instantiate<Map>(this);
+	Instantiate<Player>(this); 
+	Instantiate<Enemy>(this);
 }
 
 //更新
