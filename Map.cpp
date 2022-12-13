@@ -9,7 +9,7 @@
 
 //コンストラクタ
 Map::Map(GameObject* parent)
-	:GameObject(parent, "Map"), width_(31)
+	:GameObject(parent, "Map")
 {
 }
 
@@ -47,11 +47,6 @@ void Map::Draw()
 //開放
 void Map::Release()
 {
-}
-
-void Map::Make()
-{
-
 }
 
 

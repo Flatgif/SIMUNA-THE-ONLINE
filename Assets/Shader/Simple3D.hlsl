@@ -111,6 +111,6 @@ float4 PS(VS_OUT inData) : SV_Target
 		return float4(1, 1, 1, 1);
 	}
 	//ÅI“I‚ÈF
-	return diffuse * shade + diffuse * ambient*5 + speculer;
+	return diffuse * shade + diffuse * ambient*10 + speculer;
 	
 }

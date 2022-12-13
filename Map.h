@@ -6,11 +6,6 @@
 class Map : public GameObject
 {
     int hModel_[2];
-    int width_;
-    struct
-    {
-        int type;
-    }map_[100][100];
 
    // std::vector<std::vector<map_>> map;
 
@@ -33,5 +28,6 @@ public:
     //ŠJ•ú
     void Release() override;
 
-    void Make();
+    //ƒ‚ƒfƒ‹”Ô†æ“¾
+    int GetModelHandle(int modelNum) { return hModel_[modelNum]; }
 };

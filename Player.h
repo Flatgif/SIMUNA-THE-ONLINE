@@ -7,12 +7,17 @@ class Player : public GameObject
     int hModel_;
     //移動スピード
     float moveSpeed_;
-  
+    //視点高さ
+    float viewHeigt_;
+    //弾のスピード
+    float bulletSpeed_;
+
     typedef struct
     {
         float x;
         float y;
-    }CamSpeed;//カメラ感度設定
+    }CamSpeed;
+    //カメラ感度設定
     CamSpeed camSpeed_;
 public:
     //コンストラクタ

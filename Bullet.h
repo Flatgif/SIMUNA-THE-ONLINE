@@ -4,7 +4,11 @@
 //◆◆◆を管理するクラス
 class Bullet : public GameObject
 {
-
+    //モデル番号
+    int hModel_;    
+    //移動量
+    XMFLOAT3 move_; 
+    float bulletLanding_;
 public:
     //コンストラクタ
     Bullet(GameObject* parent);
@@ -23,4 +27,8 @@ public:
 
     //開放
     void Release() override;
+
+    //移動量セット
+    void SetMove(XMFLOAT3 move) { move_ = move; }
+
 };
