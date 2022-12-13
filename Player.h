@@ -3,7 +3,17 @@
 
 class Player : public GameObject
 {
+    //モデル番号
     int hModel_;
+    //移動スピード
+    float moveSpeed_;
+  
+    typedef struct
+    {
+        float x;
+        float y;
+    }CamSpeed;//カメラ感度設定
+    CamSpeed camSpeed_;
 public:
     //コンストラクタ
     Player(GameObject* parent);

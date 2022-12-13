@@ -5,7 +5,7 @@
 //ŸŸŸ‚ğŠÇ—‚·‚éƒNƒ‰ƒX
 class Map : public GameObject
 {
-    int hModel_[1];
+    int hModel_[2];
     int width_;
     struct
     {

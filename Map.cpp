@@ -22,9 +22,11 @@ Map::~Map()
 void Map::Initialize()
 {
 	//モデルデータのロード
-	hModel_[0] = Model::Load("sikaku.fbx");
-
-	Make();
+	hModel_[0] = Model::Load("Stage.fbx");
+	assert(hModel_ >= 0);
+	hModel_[1] = Model::Load("Wall.fbx");
+	assert(hModel_ >= 0);
+	transform_.rotate_.x = -90;
 }
 
 //更新
@@ -35,20 +37,11 @@ void Map::Update()
 //描画
 void Map::Draw()
 {
-	for (int i = 0; i < width_; i++)
+	for (int i = 0; i < 2; i++)
 	{
-		for (int j = 0; j < width_ ; j++)
-		{
-			int type = map_[i][j].type;
-			transform_.position_.x = i;
-			transform_.position_.z = j;
-			transform_.position_.y = 0;
-			Model::SetTransform(hModel_[type], transform_);
-			Model::Draw(hModel_[type]);
-
-		}
+		Model::SetTransform(hModel_[i], transform_);
+		Model::Draw(hModel_[i]);
 	}
-
 }
 
 //開放
@@ -58,13 +51,6 @@ void Map::Release()
 
 void Map::Make()
 {
-	for (int i = 0; i < width_; i++)
-	{
-		for (int j = 0; j < width_; j++)
-		{
-			map_[i][j].type = 0;
-		}
-	}
 
 }
 
