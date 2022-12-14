@@ -12,14 +12,16 @@
 #include "Camera.h"
 #include "Input.h"
 #include "Audio.h"
+#include "FbxParts.h"
+#include "Global.h"
 
 #pragma comment(lib,"Winmm.lib")
 
 //定数宣言
 const char* WIN_CLASS_NAME = "SampleGame";	//ウィンドウクラス名
 const int reticuleRadius = 8;
-const int screenWidth = WS_MAXIMIZEBOX;
-const int screenHeight = WS_MAXIMIZEBOX;
+const auto max = 16;
+const auto cbSize = sizeof(DISPLAY_DEVICE);
 
 //プロトタイプ宣言
 HWND InitApp(HINSTANCE hInstance, int screenWidth, int screenHeight, int nCmdShow);
@@ -29,9 +31,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 // エントリーポイント
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
-//#if defined(DEBUG) | defined(_DEBUG)
-//	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
-//#endif
+	//#if defined(DEBUG) | defined(_DEBUG)
+	//	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+	//#endif
 
 	srand((unsigned)time(NULL));
 	SetCurrentDirectory("Assets");
@@ -43,10 +45,39 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	int isDrawFps = GetPrivateProfileInt("DEBUG", "ViewFps", 0, ".\\setup.ini");		//キャプションに現在のFPSを表示するかどうか
 
 
+	// 初期化
+	DISPLAY_DEVICE devices[max], monitors[max];
+	ZeroMemory(devices, sizeof(devices));
+	ZeroMemory(monitors, sizeof(monitors));
+	// DISPLAY_DEVICE の cb メンバを DISPLAY_DEVICE のサイズで初期化する必要がある (by MSDN)
+	for (int i = 0; i < max; ++i)
+	{
+		devices[i].cb = cbSize;
+		monitors[i].cb = cbSize;
+	}
 
+	// 各ディスプレイデバイスを取得
+	for (int i = 0; (i < max) && EnumDisplayDevices(NULL, i, &devices[i], 0); ++i)
+	{
+		// アクティブなデバイス以外は無視
+		if ((devices[i].StateFlags & DISPLAY_DEVICE_ACTIVE) == 0) continue;
+
+		// モニタ情報を取得
+		EnumDisplayDevices(devices[i].DeviceName, 0, &monitors[i], 0);
+
+		// CreateDC の第1,2引数にデバイス名を指定してディスプレイコンテキストを取得
+		auto hdc = CreateDC(devices[i].DeviceName, devices[i].DeviceName, NULL, NULL);
+		// HORZSIZE を指定してディスプレイの幅を取得(mm 単位なので10で割って cm 単位に)
+		auto width = GetDeviceCaps(hdc, HORZRES);
+		// VERTSIZE を指定してディスプレイの高さを取得(同上)
+		auto height = GetDeviceCaps(hdc, VERTRES);
+
+		screenWidth = width;
+		screenHeight = height;
+		break;
+	}
 	//ウィンドウを作成
 	HWND hWnd = InitApp(hInstance, screenWidth, screenHeight, nCmdShow);
-
 	//Direct3D準備
 	Direct3D::Initialize(hWnd, screenWidth, screenHeight);
 
@@ -111,9 +142,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 				lastUpdateTime = nowTime;	//現在の時間（最後に画面を更新した時間）を覚えておく
 				FPS++;						//画面更新回数をカウントする
 
-				SetCursorPos(screenWidth/2, screenHeight/2);
+				SetCursorPos(screenWidth / 2, screenHeight / 2);
 
-				
+
 
 				//入力（キーボード、マウス、コントローラー）情報を更新
 				Input::Update();
@@ -125,9 +156,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 				//カメラを更新
 				Camera::Update();
 
-				
 
-				
+
+
 
 				//このフレームの描画開始
 				Direct3D::BeginDraw();
@@ -141,7 +172,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 
 
-				
+
 				//ちょっと休ませる
 				Sleep(1);
 			}
@@ -149,7 +180,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		}
 	}
 
-	
+
 
 	//いろいろ解放
 	Audio::Release();
@@ -218,12 +249,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	switch (msg)
 	{
-	//ウィンドウを閉じた
+		//ウィンドウを閉じた
 	case WM_DESTROY:
 		PostQuitMessage(0);	//プログラム終了
 		return 0;
 
-	//マウスが動いた
+		//マウスが動いた
 	case WM_MOUSEMOVE:
 		Input::SetMousePosition(LOWORD(lParam), HIWORD(lParam));
 		ShowCursor(false);

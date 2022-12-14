@@ -19,6 +19,8 @@ cbuffer global
 	float4		g_vecSpeculer;		// スペキュラーカラー（ハイライトの色）
 	float4		g_vecCameraPosition;// 視点（カメラの位置）
 	float		g_shuniness;		// ハイライトの強さ（テカリ具合）
+	int         g_widht;
+	int         g_heigt;
 	bool		g_isTexture;		// テクスチャ貼ってあるかどうか
 
 };
@@ -83,7 +85,7 @@ float4 PS(VS_OUT inData) : SV_Target
 
 	float4 diffuse;
 	//テクスチャ有無
-	if (g_isTexture == true)
+	if (g_isTexture == true)																																							
 	{
 		//テクスチャの色
 		diffuse = g_texture.Sample(g_sampler, inData.uv);
@@ -106,7 +108,7 @@ float4 PS(VS_OUT inData) : SV_Target
 		speculer = pow(saturate(dot(R, inData.eye)), g_shuniness) * g_vecSpeculer;	//ハイライトを求める
 	}
 
-	if (inData.pos.x > 957 && inData.pos.x < 963 && inData.pos.y > 537 && inData.pos.y < 543)
+	if (inData.pos.x > ((g_widht / 2) - 2) && inData.pos.x < ((g_widht / 2) + 2) && inData.pos.y >((g_heigt / 2) - 2) && inData.pos.y < ((g_heigt / 2) + 2))
 	{
 		return float4(1, 1, 1, 1);
 	}

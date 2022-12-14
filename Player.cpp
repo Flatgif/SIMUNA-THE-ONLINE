@@ -7,7 +7,7 @@
 
 //コンストラクタ
 Player::Player(GameObject* parent)
-    :GameObject(parent, "Player"), hModel_(-1),moveSpeed_(0.9f),viewHeigt_(10.0f), bulletSpeed_(0.8f)
+    :GameObject(parent, "Player"), hModel_(-1),moveSpeed_(0.9f),viewHeigt_(10.0f), bulletSpeed_(0.8f),recoil_(0.2f)
 {
 	camSpeed_.x = 2.0f;
 	camSpeed_.y = 1.0f;
@@ -99,13 +99,10 @@ void Player::Update()
 
 	//マウスの移動量を正規化
 	XMFLOAT3 mouseMove = Input::GetMouseMove();
-	XMVECTOR vMouseMove = XMLoadFloat3(&mouseMove);
-	vMouseMove = XMVector3Normalize(vMouseMove);
-	XMStoreFloat3(&mouseMove, vMouseMove);
 
 	//視点の回転（マウスの移動量）
-	transform_.rotate_.x += mouseMove.y * camSpeed_.y;
-	transform_.rotate_.y += mouseMove.x * camSpeed_.x;
+	transform_.rotate_.x += mouseMove.y/10 * camSpeed_.y;
+	transform_.rotate_.y += mouseMove.x/10 * camSpeed_.x;
 	if (transform_.rotate_.x >= 89)
 	{
 		transform_.rotate_.x = 89;
@@ -128,7 +125,7 @@ void Player::Update()
 
 	if (Input::IsMouseButton(0x00))
 	{
-		transform_.rotate_.x -= 0.15f;
+		transform_.rotate_.x -= recoil_;
 		Bullet* pBullet = Instantiate<Bullet>(GetParent()->GetParent());
 		XMFLOAT3 bulletPos= transform_.position_;
 		XMVECTOR move = (target- myself);

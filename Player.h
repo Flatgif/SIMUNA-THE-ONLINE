@@ -11,6 +11,7 @@ class Player : public GameObject
     float viewHeigt_;
     //弾のスピード
     float bulletSpeed_;
+    float recoil_;
     typedef struct
     {
         float x;
