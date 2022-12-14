@@ -106,7 +106,7 @@ float4 PS(VS_OUT inData) : SV_Target
 		speculer = pow(saturate(dot(R, inData.eye)), g_shuniness) * g_vecSpeculer;	//ハイライトを求める
 	}
 
-	if (inData.pos.x > 638 && inData.pos.x < 642 && inData.pos.y > 358 && inData.pos.y < 362)
+	if (inData.pos.x > 957 && inData.pos.x < 963 && inData.pos.y > 537 && inData.pos.y < 543)
 	{
 		return float4(1, 1, 1, 1);
 	}

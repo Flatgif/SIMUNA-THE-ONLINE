@@ -4,9 +4,10 @@
 #include "Engine/Camera.h"
 #include "Map.h"
 #include "Bullet.h"
+
 //コンストラクタ
 Player::Player(GameObject* parent)
-    :GameObject(parent, "Player"), hModel_(-1),moveSpeed_(0.3f),viewHeigt_(5.0f), bulletSpeed_(0.8f)
+    :GameObject(parent, "Player"), hModel_(-1),moveSpeed_(0.9f),viewHeigt_(10.0f), bulletSpeed_(0.8f)
 {
 	camSpeed_.x = 2.0f;
 	camSpeed_.y = 1.0f;
@@ -35,7 +36,9 @@ void Player::Update()
 	int hGroundModel = pMap->GetModelHandle(0);    
 	RayCastData data;
 	//レイの発射位置
-	data.start = transform_.position_;   
+	XMFLOAT3 startPos = transform_.position_;
+	startPos.y += 1;
+	data.start = startPos;   
 	data.start.y = 0;
 	//レイの方向
 	data.dir = XMFLOAT3(0, -1, 0);    
@@ -115,12 +118,17 @@ void Player::Update()
 	XMStoreFloat3(&camPos, vPos + vCam);
 	XMVECTOR myself = XMLoadFloat3(&camPos);
 	XMVECTOR target = XMLoadFloat3(&transform_.position_);
+
+
+
+
 	Camera::SetPosition(camPos);
 	Camera::SetTarget(transform_.position_);
 
 
 	if (Input::IsMouseButton(0x00))
 	{
+		transform_.rotate_.x -= 0.15f;
 		Bullet* pBullet = Instantiate<Bullet>(GetParent()->GetParent());
 		XMFLOAT3 bulletPos= transform_.position_;
 		XMVECTOR move = (target- myself);

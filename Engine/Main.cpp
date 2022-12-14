@@ -18,6 +18,8 @@
 //定数宣言
 const char* WIN_CLASS_NAME = "SampleGame";	//ウィンドウクラス名
 const int reticuleRadius = 8;
+const int screenWidth = WS_MAXIMIZEBOX;
+const int screenHeight = WS_MAXIMIZEBOX;
 
 //プロトタイプ宣言
 HWND InitApp(HINSTANCE hInstance, int screenWidth, int screenHeight, int nCmdShow);
@@ -182,7 +184,7 @@ HWND InitApp(HINSTANCE hInstance, int screenWidth, int screenHeight, int nCmdSho
 
 	//ウィンドウサイズの計算
 	RECT winRect = { 0, 0, screenWidth, screenHeight };
-	AdjustWindowRect(&winRect, WS_OVERLAPPEDWINDOW, FALSE);
+	AdjustWindowRect(&winRect, WS_MAXIMIZEBOX, FALSE);
 
 	//タイトルバーに表示する内容
 	char caption[64];
@@ -192,7 +194,7 @@ HWND InitApp(HINSTANCE hInstance, int screenWidth, int screenHeight, int nCmdSho
 	HWND hWnd = CreateWindow(
 		WIN_CLASS_NAME,					//ウィンドウクラス名
 		caption,						//タイトルバーに表示する内容
-		WS_OVERLAPPEDWINDOW,			//スタイル（普通のウィンドウ）
+		WS_MAXIMIZEBOX,			//スタイル（普通のウィンドウ）
 		CW_USEDEFAULT,					//表示位置左（おまかせ）
 		CW_USEDEFAULT,					//表示位置上（おまかせ）
 		winRect.right - winRect.left,	//ウィンドウ幅
@@ -202,7 +204,8 @@ HWND InitApp(HINSTANCE hInstance, int screenWidth, int screenHeight, int nCmdSho
 		hInstance,						//インスタンス
 		nullptr							//パラメータ（なし）
 	);
-	
+	SetWindowLong(hWnd, GWL_STYLE, 0);
+
 	//ウィンドウを表示
 	ShowWindow(hWnd, nCmdShow);
 

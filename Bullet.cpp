@@ -5,7 +5,7 @@
 
 //コンストラクタ
 Bullet::Bullet(GameObject* parent)
-    :GameObject(parent, "Bullet"), hModel_(-1), move_(XMFLOAT3(0.1f, 0, 0)), bulletLanding_(0.001f)
+    :GameObject(parent, "Bullet"), hModel_(-1), move_(XMFLOAT3(0.1f, 0, 0)), bulletLanding_(0.00001f)
 {
 }
 
@@ -38,9 +38,10 @@ void Bullet::Update()
     }
     XMStoreFloat3(&transform_.position_, vPos);
 
-    if (transform_.position_.y <= -20 || transform_.position_.y >= 200 ||
-        transform_.position_.x <= -1000 || transform_.position_.x >= 1000 ||
-        transform_.position_.z <= -1000 || transform_.position_.z >= 1000)
+    int num = 200;
+    if (transform_.position_.y <= -num || transform_.position_.y >= num ||
+        transform_.position_.x <= -num || transform_.position_.x >= num ||
+        transform_.position_.z <= -num || transform_.position_.z >= num)
     {
         KillMe();
     }
