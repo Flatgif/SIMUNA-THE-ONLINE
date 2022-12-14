@@ -1,5 +1,7 @@
 
 
+
+
 #include <Windows.h>
 #include <stdlib.h>
 #include <assert.h>
@@ -67,13 +69,25 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 		// CreateDC の第1,2引数にデバイス名を指定してディスプレイコンテキストを取得
 		auto hdc = CreateDC(devices[i].DeviceName, devices[i].DeviceName, NULL, NULL);
-		// HORZSIZE を指定してディスプレイの幅を取得(mm 単位なので10で割って cm 単位に)
+		// HORZSIZE を指定してディスプレイの幅を取得（ピクセルで)
 		auto width = GetDeviceCaps(hdc, HORZRES);
 		// VERTSIZE を指定してディスプレイの高さを取得(同上)
 		auto height = GetDeviceCaps(hdc, VERTRES);
 		screenWidth = width;
 		screenHeight = height;
+		auto widthCm = GetDeviceCaps(hdc, HORZSIZE) / 10.0;
+		// VERTSIZE を指定してディスプレイの高さを取得(同上)
+		auto heightCm = GetDeviceCaps(hdc, VERTSIZE) / 10.0;
+		// ついでにインチも計算
+		auto inch = sqrt(widthCm * widthCm + heightCm * heightCm) / 2.54;
+		swprintf_s(text, TEXT(L"%s\n幅=%.1f, 高さ=%.1f\n%.1fインチ"),
+			monitors[i].DeviceString, widthCm, heightCm, inch);
+		MessageBox(NULL, (char*)text, TEXT("ディスプレイデバイス情報"), MB_OK);
+
+		DeleteDC(hdc);
+
 	}
+
 	//ウィンドウを作成
 	HWND hWnd = InitApp(hInstance, screenWidth, screenHeight, nCmdShow);
 

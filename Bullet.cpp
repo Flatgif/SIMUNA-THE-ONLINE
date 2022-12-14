@@ -51,8 +51,8 @@ void Bullet::Update()
 //•`‰æ
 void Bullet::Draw()
 {
-    Model::SetTransform(hModel_, transform_);
-    Model::Draw(hModel_);
+    //Model::SetTransform(hModel_, transform_);
+    //Model::Draw(hModel_);
 
 }
 
