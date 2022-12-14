@@ -49,6 +49,26 @@ void Player::Update()
 		transform_.position_.y = -data.dist + viewHeigt_;
 	}
 
+	if (Input::IsKey(DIK_LSHIFT))
+	{
+		moveFlag_ = run;
+	}
+
+	switch (moveFlag_)
+	{
+	case run:
+		moveSpeed_ = moveSpeed_;
+		break;
+	case jamp:
+		break;
+	case crouchDown:
+		break;
+	default:
+		moveSpeed_ = 0.8f;
+
+		break;
+	}
+
 	//Cameraの軸
 	 
 	//Y軸で()度回転;
@@ -87,7 +107,6 @@ void Player::Update()
 	}
 	//ポジション反映
 	XMStoreFloat3(&transform_.position_, vPos);
-
 
 	//Cameraの処理
 

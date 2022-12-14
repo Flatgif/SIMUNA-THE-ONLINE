@@ -19,6 +19,14 @@ class Player : public GameObject
     }CamSpeed;
     //カメラ感度設定
     CamSpeed camSpeed_;
+
+    enum MoveFlag
+    {
+        run = 0x001,    
+        jamp = 0x002,    
+        crouchDown = 0x004,   
+    };
+    MoveFlag moveFlag_;
 public:
     //コンストラクタ
     Player(GameObject* parent);
