@@ -126,7 +126,7 @@ void Player::Update()
 	Camera::SetTarget(transform_.position_);
 
 
-	if (Input::IsMouseButton(0x00))
+	if (Input::IsMouseButton(0))
 	{
 		transform_.rotate_.x -= 0.15f;
 		Bullet* pBullet = Instantiate<Bullet>(GetParent()->GetParent());
