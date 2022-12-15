@@ -12,6 +12,8 @@ class Player : public GameObject
     //弾のスピード
     float bulletSpeed_;
     float recoil_;
+    float runSpeed_;
+    float crouchDownHeigt_;
     typedef struct
     {
         float x;
@@ -22,11 +24,12 @@ class Player : public GameObject
 
     enum MoveFlag
     {
+        noMove = 0x000,
         run = 0x001,    
         jamp = 0x002,    
         crouchDown = 0x004,   
     };
-    MoveFlag moveFlag_;
+    int  moveFlag_;
 public:
     //コンストラクタ
     Player(GameObject* parent);

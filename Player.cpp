@@ -7,7 +7,10 @@
 
 //コンストラクタ
 Player::Player(GameObject* parent)
-    :GameObject(parent, "Player"), hModel_(-1),moveSpeed_(0.9f),viewHeigt_(10.0f), bulletSpeed_(0.8f),recoil_(0.2f)
+    :GameObject(parent, "Player"), hModel_(-1),
+	moveSpeed_(0.9f),viewHeigt_(10.0f), bulletSpeed_(2.0f),
+	recoil_(0.2f),runSpeed_(1.0f)
+	,crouchDownHeigt_(5.0f)
 {
 	camSpeed_.x = 2.0f;
 	camSpeed_.y = 1.0f;
@@ -30,44 +33,8 @@ void Player::Initialize()
 //更新
 void Player::Update()
 {
-	//マップオブジェクトを探す
-	Map* pMap = (Map*)FindObject("Map");    
-	// 床のモデル番号を取得
-	int hGroundModel = pMap->GetModelHandle(0);    
-	RayCastData data;
-	//レイの発射位置
-	XMFLOAT3 startPos = transform_.position_;
-	startPos.y += 1;
-	data.start = startPos;   
-	data.start.y = 0;
-	//レイの方向
-	data.dir = XMFLOAT3(0, -1, 0);    
-	//レイを発射
-	Model::RayCast(hGroundModel, &data); 
-	if (data.hit)
-	{
-		transform_.position_.y = -data.dist + viewHeigt_;
-	}
 
-	if (Input::IsKey(DIK_LSHIFT))
-	{
-		moveFlag_ = run;
-	}
 
-	switch (moveFlag_)
-	{
-	case run:
-		moveSpeed_ = moveSpeed_;
-		break;
-	case jamp:
-		break;
-	case crouchDown:
-		break;
-	default:
-		moveSpeed_ = 0.8f;
-
-		break;
-	}
 
 	//Cameraの軸
 	 
@@ -82,6 +49,40 @@ void Player::Update()
 	XMFLOAT3 move = { 0, 0, moveSpeed_};
 	XMFLOAT3 moveX = { moveSpeed_, 0, 0 };
 
+	
+	if (Input::IsKey(DIK_LSHIFT))
+	{
+		moveFlag_ = run;
+	}
+	if (moveFlag_ == run && Input::IsKey(DIK_LCONTROL) || Input::IsKey(DIK_RCONTROL))
+	{
+		moveFlag_ = crouchDown;
+	}
+
+	if (Input::IsKey(DIK_LCONTROL)|| Input::IsKey(DIK_RCONTROL))
+	{
+		moveFlag_ = crouchDown;
+	}
+
+	switch (moveFlag_)
+	{
+	case run:
+		move =  { 0, 0, moveSpeed_ + runSpeed_};
+		moveX = { moveSpeed_+runSpeed_, 0, 0 };
+		viewHeigt_ = 10.0f;
+		break;
+	case jamp:
+		break;
+	case crouchDown:
+		viewHeigt_ = crouchDownHeigt_;
+		move = { 0, 0, moveSpeed_/2 };
+		moveX = { moveSpeed_/2, 0, 0 };
+		break;
+	default:
+		moveSpeed_ = 0.9f;
+		viewHeigt_ = 10.0f;
+		break;
+	}
 	XMVECTOR vMove = XMLoadFloat3(&move);
 	XMVECTOR vMoveX = XMLoadFloat3(&moveX);
 	vMove = XMVector3TransformCoord(vMove, mRotate);
@@ -141,6 +142,24 @@ void Player::Update()
 	Camera::SetPosition(camPos);
 	Camera::SetTarget(transform_.position_);
 
+	//マップオブジェクトを探す
+	Map* pMap = (Map*)FindObject("Map");
+	// 床のモデル番号を取得
+	int hGroundModel = pMap->GetModelHandle(0);
+	RayCastData data;
+	//レイの発射位置
+	XMFLOAT3 startPos = transform_.position_;
+	startPos.y += 1;
+	data.start = startPos;
+	data.start.y = 0;
+	//レイの方向
+	data.dir = XMFLOAT3(0, -1, 0);
+	//レイを発射
+	Model::RayCast(hGroundModel, &data);
+	if (data.hit)
+	{
+		transform_.position_.y = -data.dist + viewHeigt_;
+	}
 
 	if (Input::IsMouseButton(0x00))
 	{
@@ -156,7 +175,8 @@ void Player::Update()
 		pBullet->SetPosition(transform_.position_);
 		pBullet->SetMove(camPos);
 	}
-
+	
+	moveFlag_ = noMove;
 
 	//強制終了
 	if (Input::IsKey(DIK_ESCAPE))
