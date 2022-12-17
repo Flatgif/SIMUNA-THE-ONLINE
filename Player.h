@@ -3,6 +3,11 @@
 
 class Player : public GameObject
 {
+
+    const FLOAT JUMPSPEED = 5.0f;   //ジャンプ速度
+    const FLOAT GRAVITY = 0.5f;     //重力
+
+
     //モデル番号
     int hModel_;
     //移動スピード
@@ -18,6 +23,15 @@ class Player : public GameObject
     }CamSpeed;
     //カメラ感度設定
     CamSpeed camSpeed_;
+
+    
+    //ジャンプ関連
+    bool jumpFlg;   //ジャンプフラグ
+    float initVec = JUMPSPEED;//ジャンプの初速度 
+    float checkYG;          //ジャンプ時のy座標を保存する変数
+
+
+
 public:
     //コンストラクタ
     Player(GameObject* parent);

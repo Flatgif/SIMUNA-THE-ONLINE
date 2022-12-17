@@ -142,6 +142,43 @@ void Player::Update()
 	}
 
 
+	//プレイヤーの行動処理
+
+	//ジャンプ
+	if (Input::IsKeyDown(DIK_SPACE) && jumpFlg == false)
+	{
+		jumpFlg = true;
+
+		//現在のy座標を保存
+		checkYG = transform_.position_.y;
+	}
+
+	//ジャンプフラグが立っていたら
+	if (jumpFlg == true)
+	{
+		//ジャンプさせる
+		transform_.position_.y += initVec;
+		initVec -= GRAVITY;				//重力を加える
+
+		//保存した座標より高ければ
+		if (transform_.position_.y > checkYG)
+		{
+			transform_.position_.y += initVec;
+			initVec -= GRAVITY;				//重力を加える
+		}
+		else
+		{
+			transform_.position_.y = checkYG;
+			jumpFlg = false;
+		}
+	}
+
+
+	//しゃがみ
+	
+
+	//ダッシュ
+
 	//強制終了
 	if (Input::IsKey(DIK_ESCAPE))
 	{
