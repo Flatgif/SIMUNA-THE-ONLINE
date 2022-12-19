@@ -50,13 +50,13 @@ void Player::Update()
 	XMFLOAT3 moveX = { moveSpeed_, 0, 0 };
 
 	
-	if (Input::IsKey(DIK_LSHIFT))
-	{
-		moveFlag_ = run;
-	}
 	if (moveFlag_ == run && Input::IsKey(DIK_LCONTROL) || Input::IsKey(DIK_RCONTROL))
 	{
 		moveFlag_ = crouchDown;
+	}
+	if (Input::IsKey(DIK_LSHIFT))
+	{
+		moveFlag_ = run;
 	}
 
 	if (Input::IsKey(DIK_LCONTROL)|| Input::IsKey(DIK_RCONTROL))
