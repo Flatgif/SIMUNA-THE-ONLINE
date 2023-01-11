@@ -9,6 +9,10 @@ class Player : public GameObject
     float moveSpeed_;
     float runSpeed_;
     float crouchDownSpeed_;
+
+    float jumpPower_;
+    float jumpPowerDefault_;
+    float gravity_;
     //視点高さ
     float viewHeigt_;
     //弾のスピード
@@ -29,14 +33,18 @@ class Player : public GameObject
         noMove = 1<<0,
         walk = 1<<1,
         run = 1<<2,    
-        jamp = 1<<3,   
+        jump = 1<<3,   
         crouchDown = 1<<4,
     };
     int  moveFlag_;
-
+    XMFLOAT3 prePos;
+    XMFLOAT3 move;
+    XMFLOAT3 moveX;
+    XMFLOAT3 jump_;
     XMVECTOR vMove;
     XMVECTOR vMoveX;
     XMVECTOR vPos;
+    XMVECTOR vJump;
 public:
     //コンストラクタ
     Player(GameObject* parent);
@@ -61,6 +69,7 @@ public:
     void MovePlayerB();
     void MovePlayerR();
     void MovePlayerL();
-
+    void CrouchDown();
+    void Run();
     void jampPlayer();
 };

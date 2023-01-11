@@ -5,15 +5,17 @@
 #include "Map.h"
 #include "Bullet.h"
 
+
 //コンストラクタ
 Player::Player(GameObject* parent)
-    :GameObject(parent, "Player"), hModel_(-1),
-	moveSpeed_(0.9f),viewHeigt_(10.0f), bulletSpeed_(2.0f),
-	recoil_(0.2f),runSpeed_(moveSpeed_*2),defaultHeigt_(10.0f)
-	,crouchDownHeigt_(defaultHeigt_/2), crouchDownSpeed_(moveSpeed_/2)
+	:GameObject(parent, "Player"), hModel_(-1),
+	moveSpeed_(0.9f), viewHeigt_(10.0f), bulletSpeed_(2.0f), recoil_(0.2f), defaultHeigt_(10.0f), jumpPowerDefault_(1.5f), gravity_(0.05f)
+	, crouchDownHeigt_(defaultHeigt_ / 2), crouchDownSpeed_(moveSpeed_ / 2), runSpeed_(moveSpeed_ * 2)
+	, vMove({ 0.0f, 0.0f, 0.0f, 0.0f }), vMoveX({ 0.0f, 0.0f, 0.0f, 0.0f }), vPos({ 0.0f, 0.0f, 0.0f, 0.0f }), move({ 0,0,0 }), moveX({ 0,0,0 })
 {
 	camSpeed_.x = 2.0f;
 	camSpeed_.y = 1.0f;
+	jumpPower_ = jumpPowerDefault_;
 }
 
 //デストラクタ
@@ -23,7 +25,7 @@ Player::~Player()
 
 //初期化
 void Player::Initialize()
-{	
+{
 	//モデルデータのロード
 	hModel_ = Model::Load("player.fbx");
 	assert(hModel_ >= 0);
@@ -33,20 +35,31 @@ void Player::Initialize()
 //更新
 void Player::Update()
 {
+	if (moveFlag_ != jump)
+	{
+	prePos = transform_.position_;
+	}
 	//Cameraの軸
-	 
+
 	//Y軸で()度回転;
-	XMMATRIX mRotate = XMMatrixRotationY(XMConvertToRadians(transform_.rotate_.y));   
+	XMMATRIX mRotate = XMMatrixRotationY(XMConvertToRadians(transform_.rotate_.y));
 	//x軸で()度回転;
-	XMMATRIX mRotateX = XMMatrixRotationX(XMConvertToRadians(transform_.rotate_.x));   
+	XMMATRIX mRotateX = XMMatrixRotationX(XMConvertToRadians(transform_.rotate_.x));
 	//positionもベクトルに変換
 	vPos = XMLoadFloat3(&transform_.position_);
-	{
-		//移動量
-		XMFLOAT3 move = { 0, 0, moveSpeed_ };
-		XMFLOAT3 moveX = { moveSpeed_, 0, 0 };
 
-		//移動入力処理
+
+	//移動量
+	move = { 0, 0, moveSpeed_ };
+	moveX = { moveSpeed_, 0, 0 };
+	//移動入力処理
+	if (moveFlag_ != jump)
+	{
+		if (Input::IsKeyDown(DIK_SPACE))
+		{
+			moveFlag_ += jump;
+		}
+
 		if (Input::IsKey(DIK_D))
 		{
 			MovePlayerR();
@@ -65,36 +78,38 @@ void Player::Update()
 		}
 		if (Input::IsKey(DIK_LSHIFT))
 		{
-			moveFlag_ = run;
+			moveFlag_ += run;
 		}
 		if (Input::IsKey(DIK_LCONTROL) || Input::IsKey(DIK_RCONTROL))
 		{
-			moveFlag_ = crouchDown;
+			moveFlag_ += crouchDown;
 		}
 
-		switch (moveFlag_)
-		{
-		case run:
-			move = { 0, 0, runSpeed_ };
-			moveX = { runSpeed_, 0, 0 };
-			viewHeigt_ = defaultHeigt_;
-			break;
-		case jamp:
-			break;
-		case crouchDown:
-			viewHeigt_ = crouchDownHeigt_;
-			move = { 0, 0, crouchDownSpeed_ };
-			moveX = { crouchDownSpeed_, 0, 0 };
-			break;
-		default:
-			viewHeigt_ = defaultHeigt_;
-			break;
-		}
 
-		//ポジション反映
-		vMove = XMLoadFloat3(&move);
-		vMoveX = XMLoadFloat3(&moveX);
 	}
+	switch (moveFlag_)
+	{
+	case run:
+		Run();
+		break;
+	case crouchDown:
+		CrouchDown();
+		break;
+	case jump:
+		jampPlayer();
+		break;
+	case jump + run:
+
+		break;
+	default:
+		viewHeigt_ = defaultHeigt_;
+		break;
+	}
+	//ポジション反映
+	vMove = XMLoadFloat3(&move);
+	vMoveX = XMLoadFloat3(&moveX);
+	vJump = XMLoadFloat3(&jump_);
+
 	vMove = XMVector3TransformCoord(vMove, mRotate);
 	vMoveX = XMVector3TransformCoord(vMoveX, mRotate);
 	XMStoreFloat3(&transform_.position_, vPos);
@@ -111,8 +126,8 @@ void Player::Update()
 	XMFLOAT3 mouseMove = Input::GetMouseMove();
 
 	//視点の回転（マウスの移動量）
-	transform_.rotate_.x += mouseMove.y/10 * camSpeed_.y;
-	transform_.rotate_.y += mouseMove.x/10 * camSpeed_.x;
+	transform_.rotate_.x += mouseMove.y / 10 * camSpeed_.y;
+	transform_.rotate_.y += mouseMove.x / 10 * camSpeed_.x;
 	if (transform_.rotate_.x >= 89)
 	{
 		transform_.rotate_.x = 89;
@@ -143,17 +158,27 @@ void Player::Update()
 	data.dir = XMFLOAT3(0, -1, 0);
 	//レイを発射
 	Model::RayCast(hGroundModel, &data);
+	if (!data.hit)
+	{
+		moveFlag_ = noMove;
+		jumpPower_ = jumpPowerDefault_;
+		prePos = transform_.position_;
+	}
 	if (data.hit)
 	{
-		transform_.position_.y = -data.dist + viewHeigt_;
+		if (moveFlag_ != jump)
+		{
+			transform_.position_.y = -data.dist+viewHeigt_ ;
+
+		}
 	}
 
 	if (Input::IsMouseButton(0x00))
 	{
 		transform_.rotate_.x -= recoil_;
 		Bullet* pBullet = Instantiate<Bullet>(GetParent()->GetParent());
-		XMFLOAT3 bulletPos= transform_.position_;
-		XMVECTOR move = (target- myself);
+		XMFLOAT3 bulletPos = transform_.position_;
+		XMVECTOR move = (target - myself);
 		//このままだと大砲の長さで弾の速度が決まるのでベクトルを正規化
 		move = XMVector3Normalize(move);
 		//正規化して長さ1の単位ベクトルにした値にかけてあげたりすることで調整できる
@@ -162,13 +187,12 @@ void Player::Update()
 		pBullet->SetPosition(transform_.position_);
 		pBullet->SetMove(camPos);
 	}
-	
-	moveFlag_ = noMove;
+
 
 	//強制終了
 	if (Input::IsKey(DIK_ESCAPE))
 	{
-	PostQuitMessage(0);
+		PostQuitMessage(0);
 	}
 
 }
@@ -188,29 +212,39 @@ void Player::Release()
 void Player::MovePlayerF()
 {
 	vPos += vMove;
-	moveFlag_ = walk;
 }
 
 void Player::MovePlayerB()
 {
 	vPos -= vMove;
-	moveFlag_ = walk;
 }
 
 void Player::MovePlayerR()
 {
 	vPos += vMoveX;
-	moveFlag_ = walk;
 }
 
 void Player::MovePlayerL()
 {
 	vPos -= vMoveX;
-	moveFlag_ = walk;
 }
 
 void Player::jampPlayer()
 {
+	jump_ = { 0,jumpPower_,0 };
+	jumpPower_ -= gravity_;
+	vPos += vJump;
 
 }
-
+void Player::CrouchDown()
+{
+	viewHeigt_ = crouchDownHeigt_;
+	move = { 0, 0, crouchDownSpeed_ };
+	moveX = { crouchDownSpeed_, 0, 0 };
+}
+void Player::Run()
+{
+	move = { 0, 0, runSpeed_ };
+	moveX = { runSpeed_, 0, 0 };
+	viewHeigt_ = defaultHeigt_;
+}
