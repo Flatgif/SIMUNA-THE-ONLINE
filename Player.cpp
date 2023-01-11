@@ -9,8 +9,8 @@
 Player::Player(GameObject* parent)
     :GameObject(parent, "Player"), hModel_(-1),
 	moveSpeed_(0.9f),viewHeigt_(10.0f), bulletSpeed_(2.0f),
-	recoil_(0.2f),runSpeed_(1.0f)
-	,crouchDownHeigt_(5.0f)
+	recoil_(0.2f),runSpeed_(moveSpeed_*2),defaultHeigt_(10.0f)
+	,crouchDownHeigt_(defaultHeigt_/2), crouchDownSpeed_(moveSpeed_/2)
 {
 	camSpeed_.x = 2.0f;
 	camSpeed_.y = 1.0f;
@@ -33,9 +33,6 @@ void Player::Initialize()
 //更新
 void Player::Update()
 {
-
-
-
 	//Cameraの軸
 	 
 	//Y軸で()度回転;
@@ -43,70 +40,63 @@ void Player::Update()
 	//x軸で()度回転;
 	XMMATRIX mRotateX = XMMatrixRotationX(XMConvertToRadians(transform_.rotate_.x));   
 	//positionもベクトルに変換
-	XMVECTOR vPos = XMLoadFloat3(&transform_.position_);
-
-	//移動量
-	XMFLOAT3 move = { 0, 0, moveSpeed_};
-	XMFLOAT3 moveX = { moveSpeed_, 0, 0 };
-
-	
-	if (moveFlag_ == run && Input::IsKey(DIK_LCONTROL) || Input::IsKey(DIK_RCONTROL))
+	vPos = XMLoadFloat3(&transform_.position_);
 	{
-		moveFlag_ = crouchDown;
-	}
-	if (Input::IsKey(DIK_LSHIFT))
-	{
-		moveFlag_ = run;
-	}
+		//移動量
+		XMFLOAT3 move = { 0, 0, moveSpeed_ };
+		XMFLOAT3 moveX = { moveSpeed_, 0, 0 };
 
-	if (Input::IsKey(DIK_LCONTROL)|| Input::IsKey(DIK_RCONTROL))
-	{
-		moveFlag_ = crouchDown;
-	}
+		//移動入力処理
+		if (Input::IsKey(DIK_D))
+		{
+			MovePlayerR();
+		}
+		if (Input::IsKey(DIK_A))
+		{
+			MovePlayerL();
+		}
+		if (Input::IsKey(DIK_W))
+		{
+			MovePlayerF();
+		}
+		if (Input::IsKey(DIK_S))
+		{
+			MovePlayerB();
+		}
+		if (Input::IsKey(DIK_LSHIFT))
+		{
+			moveFlag_ = run;
+		}
+		if (Input::IsKey(DIK_LCONTROL) || Input::IsKey(DIK_RCONTROL))
+		{
+			moveFlag_ = crouchDown;
+		}
 
-	switch (moveFlag_)
-	{
-	case run:
-		move =  { 0, 0, moveSpeed_ + runSpeed_};
-		moveX = { moveSpeed_+runSpeed_, 0, 0 };
-		viewHeigt_ = 10.0f;
-		break;
-	case jamp:
-		break;
-	case crouchDown:
-		viewHeigt_ = crouchDownHeigt_;
-		move = { 0, 0, moveSpeed_/2 };
-		moveX = { moveSpeed_/2, 0, 0 };
-		break;
-	default:
-		moveSpeed_ = 0.9f;
-		viewHeigt_ = 10.0f;
-		break;
+		switch (moveFlag_)
+		{
+		case run:
+			move = { 0, 0, runSpeed_ };
+			moveX = { runSpeed_, 0, 0 };
+			viewHeigt_ = defaultHeigt_;
+			break;
+		case jamp:
+			break;
+		case crouchDown:
+			viewHeigt_ = crouchDownHeigt_;
+			move = { 0, 0, crouchDownSpeed_ };
+			moveX = { crouchDownSpeed_, 0, 0 };
+			break;
+		default:
+			viewHeigt_ = defaultHeigt_;
+			break;
+		}
+
+		//ポジション反映
+		vMove = XMLoadFloat3(&move);
+		vMoveX = XMLoadFloat3(&moveX);
 	}
-	XMVECTOR vMove = XMLoadFloat3(&move);
-	XMVECTOR vMoveX = XMLoadFloat3(&moveX);
 	vMove = XMVector3TransformCoord(vMove, mRotate);
 	vMoveX = XMVector3TransformCoord(vMoveX, mRotate);
-
-
-	//移動入力処理
-	if (Input::IsKey(DIK_D))
-	{
-		vPos += vMoveX;
-	}
-	if (Input::IsKey(DIK_A))
-	{
-		vPos -= vMoveX;
-	}	
-	if (Input::IsKey(DIK_W))
-	{
-		vPos += vMove;
-	}
-	if (Input::IsKey(DIK_S))
-	{
-		vPos -= vMove;
-	}
-	//ポジション反映
 	XMStoreFloat3(&transform_.position_, vPos);
 
 	//Cameraの処理
@@ -132,13 +122,10 @@ void Player::Update()
 		transform_.rotate_.x = -89;
 	}
 
+	//Camera反映
 	XMStoreFloat3(&camPos, vPos + vCam);
 	XMVECTOR myself = XMLoadFloat3(&camPos);
 	XMVECTOR target = XMLoadFloat3(&transform_.position_);
-
-
-
-
 	Camera::SetPosition(camPos);
 	Camera::SetTarget(transform_.position_);
 
@@ -197,3 +184,33 @@ void Player::Draw()
 void Player::Release()
 {
 }
+
+void Player::MovePlayerF()
+{
+	vPos += vMove;
+	moveFlag_ = walk;
+}
+
+void Player::MovePlayerB()
+{
+	vPos -= vMove;
+	moveFlag_ = walk;
+}
+
+void Player::MovePlayerR()
+{
+	vPos += vMoveX;
+	moveFlag_ = walk;
+}
+
+void Player::MovePlayerL()
+{
+	vPos -= vMoveX;
+	moveFlag_ = walk;
+}
+
+void Player::jampPlayer()
+{
+
+}
+

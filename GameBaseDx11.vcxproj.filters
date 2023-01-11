@@ -95,7 +95,6 @@
     <ClCompile Include="Item.cpp" />
     <ClCompile Include="Bullet.cpp" />
     <ClCompile Include="Map.cpp" />
-    <ClCompile Include="CamTarget.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\BoxCollider.h">
@@ -167,7 +166,6 @@
     <ClInclude Include="Item.h" />
     <ClInclude Include="Bullet.h" />
     <ClInclude Include="Map.h" />
-    <ClInclude Include="CamTarget.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Assets\Shader\Simple2D.hlsl">

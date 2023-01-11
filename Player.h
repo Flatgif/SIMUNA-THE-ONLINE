@@ -7,12 +7,14 @@ class Player : public GameObject
     int hModel_;
     //移動スピード
     float moveSpeed_;
+    float runSpeed_;
+    float crouchDownSpeed_;
     //視点高さ
     float viewHeigt_;
     //弾のスピード
     float bulletSpeed_;
     float recoil_;
-    float runSpeed_;
+    float defaultHeigt_;
     float crouchDownHeigt_;
     typedef struct
     {
@@ -24,12 +26,17 @@ class Player : public GameObject
 
     enum MoveFlag
     {
-        noMove = 0x000,
-        run = 0x001,    
-        jamp = 0x002,    
-        crouchDown = 0x004,   
+        noMove = 1<<0,
+        walk = 1<<1,
+        run = 1<<2,    
+        jamp = 1<<3,   
+        crouchDown = 1<<4,
     };
     int  moveFlag_;
+
+    XMVECTOR vMove;
+    XMVECTOR vMoveX;
+    XMVECTOR vPos;
 public:
     //コンストラクタ
     Player(GameObject* parent);
@@ -48,4 +55,12 @@ public:
 
     //開放
     void Release() override;
+
+
+    void MovePlayerF();
+    void MovePlayerB();
+    void MovePlayerR();
+    void MovePlayerL();
+
+    void jampPlayer();
 };
