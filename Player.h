@@ -71,5 +71,5 @@ public:
     void MovePlayerL();
     void CrouchDown();
     void Run();
-    void jampPlayer();
+    void JumpPlayer();
 };

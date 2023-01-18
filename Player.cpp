@@ -9,7 +9,7 @@
 //コンストラクタ
 Player::Player(GameObject* parent)
 	:GameObject(parent, "Player"), hModel_(-1),
-	moveSpeed_(0.9f), viewHeigt_(10.0f), bulletSpeed_(2.0f), recoil_(0.2f), defaultHeigt_(10.0f), jumpPowerDefault_(1.5f), gravity_(0.05f)
+	moveSpeed_(0.9f), viewHeigt_(10.0f), bulletSpeed_(2.0f), recoil_(0.2f), defaultHeigt_(10.0f), jumpPowerDefault_(1.0f), gravity_(0.05f)
 	, crouchDownHeigt_(defaultHeigt_ / 2), crouchDownSpeed_(moveSpeed_ / 2), runSpeed_(moveSpeed_ * 2)
 	, vMove({ 0.0f, 0.0f, 0.0f, 0.0f }), vMoveX({ 0.0f, 0.0f, 0.0f, 0.0f }), vPos({ 0.0f, 0.0f, 0.0f, 0.0f }), move({ 0,0,0 }), moveX({ 0,0,0 })
 {
@@ -35,9 +35,10 @@ void Player::Initialize()
 //更新
 void Player::Update()
 {
+
 	if (moveFlag_ != jump)
 	{
-	prePos = transform_.position_;
+		prePos = transform_.position_;
 	}
 	//Cameraの軸
 
@@ -53,56 +54,63 @@ void Player::Update()
 	move = { 0, 0, moveSpeed_ };
 	moveX = { moveSpeed_, 0, 0 };
 	//移動入力処理
-	if (moveFlag_ != jump)
+	if (Input::IsKeyDown(DIK_SPACE))
 	{
-		if (Input::IsKeyDown(DIK_SPACE))
-		{
-			moveFlag_ += jump;
-		}
+		moveFlag_ = jump;
+	}
 
-		if (Input::IsKey(DIK_D))
-		{
-			MovePlayerR();
-		}
-		if (Input::IsKey(DIK_A))
-		{
-			MovePlayerL();
-		}
-		if (Input::IsKey(DIK_W))
-		{
-			MovePlayerF();
-		}
-		if (Input::IsKey(DIK_S))
-		{
-			MovePlayerB();
-		}
-		if (Input::IsKey(DIK_LSHIFT))
-		{
-			moveFlag_ += run;
-		}
-		if (Input::IsKey(DIK_LCONTROL) || Input::IsKey(DIK_RCONTROL))
-		{
-			moveFlag_ += crouchDown;
-		}
-
+	if (Input::IsKey(DIK_D))
+	{
+		MovePlayerR();
+		if (moveFlag_ != jump)
+			moveFlag_ = walk;
+	}
+	if (Input::IsKey(DIK_A))
+	{
+		MovePlayerL();
+		if (moveFlag_ != jump)
+			moveFlag_ = walk;
+	}
+	if (Input::IsKey(DIK_W))
+	{
+		MovePlayerF();
+		if (moveFlag_ != jump)
+			moveFlag_ = walk;
+	}
+	if (Input::IsKey(DIK_S))
+	{
+		MovePlayerB();
+		if (moveFlag_ != jump)
+			moveFlag_ = walk;
 
 	}
+	//if (Input::IsKey(DIK_LSHIFT))
+	//{
+	//	moveFlag_ = run;
+	//}
+	//if (Input::IsKey(DIK_LCONTROL) || Input::IsKey(DIK_RCONTROL))
+	//{
+	//	moveFlag_ = crouchDown;
+	//}
+
+
 	switch (moveFlag_)
 	{
-	case run:
-		Run();
-		break;
-	case crouchDown:
-		CrouchDown();
-		break;
+		//case run:
+		//	Run();
+		//	break;
+		//case crouchDown:
+		//	CrouchDown();
+		//	break;
 	case jump:
-		jampPlayer();
+		JumpPlayer();
 		break;
 	case jump + run:
-
-		break;
+		Run();
+		JumpPlayer();
 	default:
 		viewHeigt_ = defaultHeigt_;
+		moveFlag_ = noMove;
 		break;
 	}
 	//ポジション反映
@@ -161,14 +169,13 @@ void Player::Update()
 	if (!data.hit)
 	{
 		moveFlag_ = noMove;
-		jumpPower_ = jumpPowerDefault_;
 		prePos = transform_.position_;
 	}
 	if (data.hit)
 	{
 		if (moveFlag_ != jump)
 		{
-			transform_.position_.y = -data.dist+viewHeigt_ ;
+			transform_.position_.y = -data.dist + viewHeigt_;
 
 		}
 	}
@@ -187,7 +194,6 @@ void Player::Update()
 		pBullet->SetPosition(transform_.position_);
 		pBullet->SetMove(camPos);
 	}
-
 
 	//強制終了
 	if (Input::IsKey(DIK_ESCAPE))
@@ -229,11 +235,20 @@ void Player::MovePlayerL()
 	vPos -= vMoveX;
 }
 
-void Player::jampPlayer()
+void Player::JumpPlayer()
 {
 	jump_ = { 0,jumpPower_,0 };
 	jumpPower_ -= gravity_;
 	vPos += vJump;
+	XMFLOAT3 pos;
+	XMStoreFloat3(&pos, vPos);
+	if (prePos.y > pos.y)
+	{
+		pos.y = prePos.y;
+		jumpPower_ = jumpPowerDefault_;
+		moveFlag_ = noMove;
+	}
+	vPos = XMLoadFloat3(&pos);
 
 }
 void Player::CrouchDown()
