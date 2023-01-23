@@ -72,4 +72,6 @@ public:
     void CrouchDown();
     void Run();
     void JumpPlayer();
+
+    bool IsHit(XMVECTOR pos, XMVECTOR move, int h_model);
 };

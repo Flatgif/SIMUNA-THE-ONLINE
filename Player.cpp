@@ -16,6 +16,7 @@ Player::Player(GameObject* parent)
 	camSpeed_.x = 2.0f;
 	camSpeed_.y = 1.0f;
 	jumpPower_ = jumpPowerDefault_;
+
 }
 
 //デストラクタ
@@ -51,37 +52,39 @@ void Player::Update()
 
 
 	//移動量
+	XMVECTOR moveX= { 1, 0, 0};
+	XMVECTOR moveY = { 0, 1, 0 };
+	XMVECTOR moveZ = { 0, 0, 1 };
+
+
+
+
 	move = { 0, 0, moveSpeed_ };
 	moveX = { moveSpeed_, 0, 0 };
+
 	//移動入力処理
 	if (Input::IsKeyDown(DIK_SPACE))
 	{
 		moveFlag_ = jump;
+		jumpPower_ = jumpPowerDefault_;
+		JumpPlayer();
 	}
 
 	if (Input::IsKey(DIK_D))
 	{
 		MovePlayerR();
-		if (moveFlag_ != jump)
-			moveFlag_ = walk;
 	}
 	if (Input::IsKey(DIK_A))
 	{
 		MovePlayerL();
-		if (moveFlag_ != jump)
-			moveFlag_ = walk;
 	}
 	if (Input::IsKey(DIK_W))
 	{
 		MovePlayerF();
-		if (moveFlag_ != jump)
-			moveFlag_ = walk;
 	}
 	if (Input::IsKey(DIK_S))
 	{
 		MovePlayerB();
-		if (moveFlag_ != jump)
-			moveFlag_ = walk;
 
 	}
 	//if (Input::IsKey(DIK_LSHIFT))
@@ -103,7 +106,7 @@ void Player::Update()
 		//	CrouchDown();
 		//	break;
 	case jump:
-		JumpPlayer();
+		
 		break;
 	case jump + run:
 		Run();
@@ -116,11 +119,12 @@ void Player::Update()
 	//ポジション反映
 	vMove = XMLoadFloat3(&move);
 	vMoveX = XMLoadFloat3(&moveX);
-	vJump = XMLoadFloat3(&jump_);
 
 	vMove = XMVector3TransformCoord(vMove, mRotate);
 	vMoveX = XMVector3TransformCoord(vMoveX, mRotate);
-	XMStoreFloat3(&transform_.position_, vPos);
+
+
+	//XMStoreFloat3(&transform_.position_, vPos);
 
 	//Cameraの処理
 
@@ -166,19 +170,19 @@ void Player::Update()
 	data.dir = XMFLOAT3(0, -1, 0);
 	//レイを発射
 	Model::RayCast(hGroundModel, &data);
-	if (!data.hit)
-	{
-		moveFlag_ = noMove;
-		prePos = transform_.position_;
-	}
-	if (data.hit)
-	{
-		if (moveFlag_ != jump)
-		{
-			transform_.position_.y = -data.dist + viewHeigt_;
+	//if (!data.hit)
+	//{
+	//	moveFlag_ = noMove;
+	//	prePos = transform_.position_;
+	//}
+	//if (data.hit)
+	//{
+	//	if (moveFlag_ != jump)
+	//	{
+	//		transform_.position_.y = -data.dist + viewHeigt_;
 
-		}
-	}
+	//	}
+	//}
 
 	if (Input::IsMouseButton(0x00))
 	{
@@ -238,17 +242,24 @@ void Player::MovePlayerL()
 void Player::JumpPlayer()
 {
 	jump_ = { 0,jumpPower_,0 };
-	jumpPower_ -= gravity_;
-	vPos += vJump;
-	XMFLOAT3 pos;
-	XMStoreFloat3(&pos, vPos);
-	if (prePos.y > pos.y)
+	vJump = XMLoadFloat3(&jump_);
+	if (!IsHit(vPos, vJump, hModel_))
 	{
-		pos.y = prePos.y;
-		jumpPower_ = jumpPowerDefault_;
-		moveFlag_ = noMove;
+		vPos += vJump;
+		XMStoreFloat3(&transform_.position_, vPos);
+		jumpPower_ -= gravity_;
+
+		wchar_t buffer[256];
+		swprintf_s(buffer, L"★変数の値は%d\n", jumpPower_);
+		OutputDebugString((LPCSTR)buffer);
+
 	}
-	vPos = XMLoadFloat3(&pos);
+	else
+	{
+		moveFlag_ = noMove;
+
+	}
+
 
 }
 void Player::CrouchDown()
@@ -256,6 +267,27 @@ void Player::CrouchDown()
 	viewHeigt_ = crouchDownHeigt_;
 	move = { 0, 0, crouchDownSpeed_ };
 	moveX = { crouchDownSpeed_, 0, 0 };
+}
+bool Player::IsHit(XMVECTOR pos, XMVECTOR move, int h_model)
+{
+	pos += move;
+	XMVECTOR v = XMVector3Length(move);
+	float length = XMVectorGetX(v);
+	XMFLOAT3 dir;
+	XMStoreFloat3(&dir, pos);
+	RayCastData data;
+	data.start = transform_.position_;
+	data.dir = dir;
+	Model::RayCast(h_model, &data);
+	if (data.hit && data.dist <= length && data.dist != 0)
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+	return false;
 }
 void Player::Run()
 {
