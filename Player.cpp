@@ -52,13 +52,6 @@ void Player::Update()
 
 
 	//à⁄ìÆó 
-	XMVECTOR moveX= { 1, 0, 0};
-	XMVECTOR moveY = { 0, 1, 0 };
-	XMVECTOR moveZ = { 0, 0, 1 };
-
-
-
-
 	move = { 0, 0, moveSpeed_ };
 	moveX = { moveSpeed_, 0, 0 };
 
@@ -122,9 +115,13 @@ void Player::Update()
 
 	vMove = XMVector3TransformCoord(vMove, mRotate);
 	vMoveX = XMVector3TransformCoord(vMoveX, mRotate);
+	RayCastData d;
+	XMVECTOR normal = d.normal;
+
+	ScratchWall(normal , vPos)
 
 
-	//XMStoreFloat3(&transform_.position_, vPos);
+	XMStoreFloat3(&transform_.position_, vPos);
 
 	//CameraÇÃèàóù
 
@@ -170,19 +167,19 @@ void Player::Update()
 	data.dir = XMFLOAT3(0, -1, 0);
 	//ÉåÉCÇî≠éÀ
 	Model::RayCast(hGroundModel, &data);
-	//if (!data.hit)
-	//{
-	//	moveFlag_ = noMove;
-	//	prePos = transform_.position_;
-	//}
-	//if (data.hit)
-	//{
-	//	if (moveFlag_ != jump)
-	//	{
-	//		transform_.position_.y = -data.dist + viewHeigt_;
+	if (!data.hit)
+	{
+		moveFlag_ = noMove;
+		prePos = transform_.position_;
+	}
+	if (data.hit)
+	{
+		if (moveFlag_ != jump)
+		{
+			transform_.position_.y = -data.dist + viewHeigt_;
 
-	//	}
-	//}
+		}
+	}
 
 	if (Input::IsMouseButton(0x00))
 	{
@@ -289,6 +286,13 @@ bool Player::IsHit(XMVECTOR pos, XMVECTOR move, int h_model)
 	}
 	return false;
 }
+
+XMVECTOR Player::ScratchWall(XMVECTOR normal, XMVECTOR pos)
+{
+	normal = XMVector3Normalize(normal);
+	return XMVector3Normalize(pos - XMVector3Dot(pos, normal) * normal);
+}
+
 void Player::Run()
 {
 	move = { 0, 0, runSpeed_ };

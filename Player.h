@@ -74,4 +74,5 @@ public:
     void JumpPlayer();
 
     bool IsHit(XMVECTOR pos, XMVECTOR move, int h_model);
+    XMVECTOR ScratchWall(XMVECTOR normal, XMVECTOR pos);
 };

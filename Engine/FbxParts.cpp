@@ -605,6 +605,12 @@ void FbxParts::RayCast(RayCastData * data)
 
 			if (hit && dist < data->dist)
 			{
+				XMVECTOR v1, v2, n;
+				v1 = XMLoadFloat3(&ver[1]) - XMLoadFloat3(&ver[0]);
+				v2 = XMLoadFloat3(&ver[2]) - XMLoadFloat3(&ver[1]);
+				n = XMVector3Cross(v2, v1);
+				data->normal = n;
+
 				data->hit = TRUE;
 				data->dist = dist;
 			}
