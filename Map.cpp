@@ -22,12 +22,8 @@ Map::~Map()
 void Map::Initialize()
 {
 	//モデルデータのロード
-	hModel_[0] = Model::Load("ground.fbx");
+	hModel_[0] = Model::Load("WallSample.fbx");
 	assert(hModel_ >= 0);
-	//hModel_[1] = Model::Load("Wall.fbx");
-	//assert(hModel_ >= 0);
-	transform_.scale_ = XMFLOAT3(10,10,10);
-
 }
 
 //更新

@@ -9,13 +9,14 @@
 //コンストラクタ
 Player::Player(GameObject* parent)
 	:GameObject(parent, "Player"), hModel_(-1),
-	moveSpeed_(0.9f), viewHeigt_(10.0f), bulletSpeed_(2.0f), recoil_(0.2f), defaultHeigt_(10.0f), jumpPowerDefault_(1.0f), gravity_(0.05f)
+	moveSpeed_(0.1f), viewHeigt_(10.0f), bulletSpeed_(2.0f), recoil_(0.2f), defaultHeigt_(10.0f), jumpPowerDefault_(1.0f), gravity_(0.05f)
 	, crouchDownHeigt_(defaultHeigt_ / 2), crouchDownSpeed_(moveSpeed_ / 2), runSpeed_(moveSpeed_ * 2)
 	, vMove({ 0.0f, 0.0f, 0.0f, 0.0f }), vMoveX({ 0.0f, 0.0f, 0.0f, 0.0f }), vPos({ 0.0f, 0.0f, 0.0f, 0.0f }), move({ 0,0,0 }), moveX({ 0,0,0 })
 {
 	camSpeed_.x = 2.0f;
 	camSpeed_.y = 1.0f;
 	jumpPower_ = jumpPowerDefault_;
+	hGroundModel = -1;
 
 }
 
@@ -118,7 +119,7 @@ void Player::Update()
 	RayCastData d;
 	XMVECTOR normal = d.normal;
 
-	ScratchWall(normal , vPos)
+
 
 
 	XMStoreFloat3(&transform_.position_, vPos);
@@ -156,7 +157,8 @@ void Player::Update()
 	//マップオブジェクトを探す
 	Map* pMap = (Map*)FindObject("Map");
 	// 床のモデル番号を取得
-	int hGroundModel = pMap->GetModelHandle(0);
+	hGroundModel = pMap->GetModelHandle(0);
+
 	RayCastData data;
 	//レイの発射位置
 	XMFLOAT3 startPos = transform_.position_;
@@ -218,79 +220,82 @@ void Player::Release()
 
 void Player::MovePlayerF()
 {
-	vPos += vMove;
+	IsHit(&vPos, vMove, hGroundModel);
 }
 
 void Player::MovePlayerB()
 {
-	vPos -= vMove;
+	IsHit(&vPos, -vMove, hGroundModel);
 }
 
 void Player::MovePlayerR()
 {
-	vPos += vMoveX;
+	IsHit(&vPos, vMoveX, hGroundModel);
 }
 
 void Player::MovePlayerL()
 {
-	vPos -= vMoveX;
+	IsHit(&vPos, -vMoveX, hGroundModel);
 }
 
-void Player::JumpPlayer()
-{
-	jump_ = { 0,jumpPower_,0 };
-	vJump = XMLoadFloat3(&jump_);
-	if (!IsHit(vPos, vJump, hModel_))
-	{
-		vPos += vJump;
-		XMStoreFloat3(&transform_.position_, vPos);
-		jumpPower_ -= gravity_;
-
-		wchar_t buffer[256];
-		swprintf_s(buffer, L"★変数の値は%d\n", jumpPower_);
-		OutputDebugString((LPCSTR)buffer);
-
-	}
-	else
-	{
-		moveFlag_ = noMove;
-
-	}
-
-
+void Player::JumpPlayer(){
 }
+//{
+//	jump_ = { 0,jumpPower_,0 };
+//	vJump = XMLoadFloat3(&jump_);
+//	if (!IsHit(vPos, vJump, hModel_))
+//	{
+//		vPos += vJump;
+//		XMStoreFloat3(&transform_.position_, vPos);
+//		jumpPower_ -= gravity_;
+//
+//		wchar_t buffer[256];
+//		swprintf_s(buffer, L"★変数の値は%d\n", jumpPower_);
+//		OutputDebugString((LPCSTR)buffer);
+//
+//	}
+//	else
+//	{
+//		moveFlag_ = noMove;
+//
+//	}
+//
+//
+//}
 void Player::CrouchDown()
 {
 	viewHeigt_ = crouchDownHeigt_;
 	move = { 0, 0, crouchDownSpeed_ };
 	moveX = { crouchDownSpeed_, 0, 0 };
 }
-bool Player::IsHit(XMVECTOR pos, XMVECTOR move, int h_model)
+void Player::IsHit(XMVECTOR *pos, XMVECTOR move, int h_model)
 {
-	pos += move;
+	XMVECTOR Pos = *pos;
+	
+	
+	Pos += move;
 	XMVECTOR v = XMVector3Length(move);
 	float length = XMVectorGetX(v);
 	XMFLOAT3 dir;
-	XMStoreFloat3(&dir, pos);
+	XMStoreFloat3(&dir, Pos);
 	RayCastData data;
 	data.start = transform_.position_;
 	data.dir = dir;
 	Model::RayCast(h_model, &data);
 	if (data.hit && data.dist <= length && data.dist != 0)
 	{
-		return true;
+		*pos += ScratchWall(data.normal, vPos);
 	}
 	else
 	{
-		return false;
+		*pos += move;
 	}
-	return false;
 }
 
 XMVECTOR Player::ScratchWall(XMVECTOR normal, XMVECTOR pos)
 {
-	normal = XMVector3Normalize(normal);
-	return XMVector3Normalize(pos - XMVector3Dot(pos, normal) * normal);
+	XMVECTOR FixPos = { 1,0,1,0 };
+	return XMVector3Normalize(pos - XMVector3Dot(pos, normal) * normal) * FixPos;
 }
 
 void Player::Run()

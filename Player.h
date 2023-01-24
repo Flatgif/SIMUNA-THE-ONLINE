@@ -5,6 +5,7 @@ class Player : public GameObject
 {
     //モデル番号
     int hModel_;
+    int hGroundModel;
     //移動スピード
     float moveSpeed_;
     float runSpeed_;
@@ -73,6 +74,9 @@ public:
     void Run();
     void JumpPlayer();
 
-    bool IsHit(XMVECTOR pos, XMVECTOR move, int h_model);
+    void IsHit(XMVECTOR *pos, XMVECTOR move, int h_model);
     XMVECTOR ScratchWall(XMVECTOR normal, XMVECTOR pos);
+
+
+
 };
