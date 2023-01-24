@@ -220,55 +220,75 @@ void Player::Release()
 
 void Player::MovePlayerF()
 {
-	IsHit(&vPos, vMove, hGroundModel);
+	MoveHit(&vPos, vMove, hGroundModel);
 }
 
 void Player::MovePlayerB()
 {
-	IsHit(&vPos, -vMove, hGroundModel);
+	MoveHit(&vPos, -vMove, hGroundModel);
 }
 
 void Player::MovePlayerR()
 {
-	IsHit(&vPos, vMoveX, hGroundModel);
+	MoveHit(&vPos, vMoveX, hGroundModel);
 }
 
 void Player::MovePlayerL()
 {
-	IsHit(&vPos, -vMoveX, hGroundModel);
+	MoveHit(&vPos, -vMoveX, hGroundModel);
 }
 
 void Player::JumpPlayer(){
+	moveFlag_ = noMove;
+	jump_ = { 0,jumpPower_,0 };
+	vJump = XMLoadFloat3(&jump_);
+	if (!IsHit(&vPos, vJump, hModel_))
+	{
+		vPos += vJump;
+		XMStoreFloat3(&transform_.position_, vPos);
+		jumpPower_ -= gravity_;
+
+		wchar_t buffer[256];
+		swprintf_s(buffer, L"ÅöïœêîÇÃílÇÕ%d\n", jumpPower_);
+		OutputDebugString((LPCSTR)buffer);
+
+	}
+	else
+	{
+		moveFlag_ = noMove;
+
+	}
+
 }
-//{
-//	jump_ = { 0,jumpPower_,0 };
-//	vJump = XMLoadFloat3(&jump_);
-//	if (!IsHit(vPos, vJump, hModel_))
-//	{
-//		vPos += vJump;
-//		XMStoreFloat3(&transform_.position_, vPos);
-//		jumpPower_ -= gravity_;
-//
-//		wchar_t buffer[256];
-//		swprintf_s(buffer, L"ÅöïœêîÇÃílÇÕ%d\n", jumpPower_);
-//		OutputDebugString((LPCSTR)buffer);
-//
-//	}
-//	else
-//	{
-//		moveFlag_ = noMove;
-//
-//	}
-//
-//
-//}
+bool Player::IsHit(XMVECTOR pos, XMVECTOR move, int h_model)
+{
+	pos += move;
+	XMVECTOR v = XMVector3Length(move);
+	float length = XMVectorGetX(v);
+	XMFLOAT3 dir;
+	XMStoreFloat3(&dir, pos);
+	RayCastData data;
+	data.start = transform_.position_;
+	data.dir = dir;
+	Model::RayCast(h_model, &data);
+	if (data.hit && data.dist <= length && data.dist != 0)
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+	return false;
+
+}
 void Player::CrouchDown()
 {
 	viewHeigt_ = crouchDownHeigt_;
 	move = { 0, 0, crouchDownSpeed_ };
 	moveX = { crouchDownSpeed_, 0, 0 };
 }
-void Player::IsHit(XMVECTOR *pos, XMVECTOR move, int h_model)
+void Player::MoveHit(XMVECTOR *pos, XMVECTOR move, int h_model)
 {
 	XMVECTOR Pos = *pos;
 	

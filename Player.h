@@ -73,8 +73,8 @@ public:
     void CrouchDown();
     void Run();
     void JumpPlayer();
-
-    void IsHit(XMVECTOR *pos, XMVECTOR move, int h_model);
+    bool IsHit(XMVECTOR pos, XMVECTOR move, int h_model);
+    void MoveHit(XMVECTOR *pos, XMVECTOR move, int h_model);
     XMVECTOR ScratchWall(XMVECTOR normal, XMVECTOR pos);
 
 
