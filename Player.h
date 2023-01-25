@@ -7,21 +7,24 @@ class Player : public GameObject
     int hModel_;
     int hMapModel;
     int second_;
-    bool canJump;
     //移動スピード
     float moveSpeed_;
     float runSpeed_;
     float crouchDownSpeed_;
+
+    bool canJump;
     float jumpPower_;
     float jumpPowerDefault_;
     float gravity_;
     //視点高さ
     float viewHeigt_;
+    float defaultHeigt_;
+    float crouchDownHeigt_;
+
     //弾のスピード
     float bulletSpeed_;
     float recoil_;
-    float defaultHeigt_;
-    float crouchDownHeigt_;
+
     typedef struct
     {
         float x;
@@ -63,7 +66,6 @@ public:
 
     //開放
     void Release() override;
-
 
     void MovePlayerF();
     void MovePlayerB();
