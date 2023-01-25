@@ -5,12 +5,13 @@ class Player : public GameObject
 {
     //モデル番号
     int hModel_;
-    int hGroundModel;
+    int hMapModel;
+    int second_;
+    bool canJump;
     //移動スピード
     float moveSpeed_;
     float runSpeed_;
     float crouchDownSpeed_;
-
     float jumpPower_;
     float jumpPowerDefault_;
     float gravity_;
@@ -41,11 +42,9 @@ class Player : public GameObject
     XMFLOAT3 prePos;
     XMFLOAT3 move;
     XMFLOAT3 moveX;
-    XMFLOAT3 jump_;
     XMVECTOR vMove;
     XMVECTOR vMoveX;
     XMVECTOR vPos;
-    XMVECTOR vJump;
 public:
     //コンストラクタ
     Player(GameObject* parent);
@@ -72,7 +71,7 @@ public:
     void MovePlayerL();
     void CrouchDown();
     void Run();
-    void JumpPlayer();
+    void PlayerJump();
     bool IsHit(XMVECTOR pos, XMVECTOR move, int h_model);
     void MoveHit(XMVECTOR *pos, XMVECTOR move, int h_model);
     XMVECTOR ScratchWall(XMVECTOR normal, XMVECTOR pos);

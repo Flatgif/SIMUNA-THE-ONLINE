@@ -4,19 +4,22 @@
 #include "Engine/Camera.h"
 #include "Map.h"
 #include "Bullet.h"
+#include <corecrt_math_defines.h>
+
+#define DEBUG
 
 
 //コンストラクタ
 Player::Player(GameObject* parent)
-	:GameObject(parent, "Player"), hModel_(-1),
-	moveSpeed_(0.1f), viewHeigt_(10.0f), bulletSpeed_(2.0f), recoil_(0.2f), defaultHeigt_(10.0f), jumpPowerDefault_(1.0f), gravity_(0.05f)
+	:GameObject(parent, "Player"), hModel_(-1), second_(0),canJump(true)
+	,moveSpeed_(0.1f), viewHeigt_(10.0f), bulletSpeed_(2.0f), recoil_(0.2f), defaultHeigt_(10.0f), jumpPowerDefault_(1.0f), gravity_(0.1f)
 	, crouchDownHeigt_(defaultHeigt_ / 2), crouchDownSpeed_(moveSpeed_ / 2), runSpeed_(moveSpeed_ * 2)
 	, vMove({ 0.0f, 0.0f, 0.0f, 0.0f }), vMoveX({ 0.0f, 0.0f, 0.0f, 0.0f }), vPos({ 0.0f, 0.0f, 0.0f, 0.0f }), move({ 0,0,0 }), moveX({ 0,0,0 })
 {
 	camSpeed_.x = 2.0f;
 	camSpeed_.y = 1.0f;
+	hMapModel = -1;
 	jumpPower_ = jumpPowerDefault_;
-	hGroundModel = -1;
 
 }
 
@@ -29,19 +32,24 @@ Player::~Player()
 void Player::Initialize()
 {
 	//モデルデータのロード
-	hModel_ = Model::Load("player.fbx");
+	hModel_ = Model::Load("player1.fbx");
 	assert(hModel_ >= 0);
-	//画像データのロード
+	transform_.scale_ = { 0.5f,0.5f,0.5f };
 }
 
 //更新
 void Player::Update()
 {
 
-	if (moveFlag_ != jump)
+		
+	static int Count = 0;
+	
+	if (Count > 120)
 	{
-		prePos = transform_.position_;
+		second_++;
+		Count = 0;
 	}
+	Count++;
 	//Cameraの軸
 
 	//Y軸で()度回転;
@@ -57,12 +65,26 @@ void Player::Update()
 	moveX = { moveSpeed_, 0, 0 };
 
 	//移動入力処理
-	if (Input::IsKeyDown(DIK_SPACE))
+	if (canJump && Input::IsKeyDown(DIK_SPACE))
 	{
-		moveFlag_ = jump;
+		canJump = false;
 		jumpPower_ = jumpPowerDefault_;
-		JumpPlayer();
 	}
+	if (canJump == false)
+	{
+		PlayerJump();
+	}
+	if (Input::IsKey(DIK_Q))
+	{
+		XMFLOAT3 a = { 0,1,0 };
+	    MoveHit(&vPos, XMLoadFloat3(&a) , hMapModel);
+	}
+	if (Input::IsKey(DIK_E))
+	{
+		XMFLOAT3 a = { 0,-1,0 };
+		MoveHit(&vPos, XMLoadFloat3(&a), hMapModel);
+	}
+
 
 	if (Input::IsKey(DIK_D))
 	{
@@ -99,15 +121,9 @@ void Player::Update()
 		//case crouchDown:
 		//	CrouchDown();
 		//	break;
-	case jump:
-		
-		break;
-	case jump + run:
-		Run();
-		JumpPlayer();
 	default:
 		viewHeigt_ = defaultHeigt_;
-		moveFlag_ = noMove;
+		//moveFlag_ = noMove;
 		break;
 	}
 	//ポジション反映
@@ -119,25 +135,30 @@ void Player::Update()
 	RayCastData d;
 	XMVECTOR normal = d.normal;
 
-
-
-
 	XMStoreFloat3(&transform_.position_, vPos);
 
 	//Cameraの処理
 
 	XMFLOAT3 camPos;
+	//マウスの移動量
+	XMFLOAT3 mouseMove = Input::GetMouseMove();
+	static float mouseZ = 0;
+	mouseZ += mouseMove.z;
 	//Cameraの位置
-	XMVECTOR vCam = XMVectorSet(0, 0, -0.0001, 0);
+	//XMVECTOR vCam = XMVectorSet(0, 0,-0.0000001 , 0);
+	if (mouseZ > 0)
+		mouseZ = 0;
+	XMVECTOR vCam = XMVectorSet(0, 0, mouseZ/10 - 0.000001, 0);
+
 	vCam = XMVector3TransformCoord(vCam, mRotateX);
 	vCam = XMVector3TransformCoord(vCam, mRotate);
 
-	//マウスの移動量を正規化
-	XMFLOAT3 mouseMove = Input::GetMouseMove();
 
 	//視点の回転（マウスの移動量）
 	transform_.rotate_.x += mouseMove.y / 10 * camSpeed_.y;
 	transform_.rotate_.y += mouseMove.x / 10 * camSpeed_.x;
+
+
 	if (transform_.rotate_.x >= 89)
 	{
 		transform_.rotate_.x = 89;
@@ -157,7 +178,7 @@ void Player::Update()
 	//マップオブジェクトを探す
 	Map* pMap = (Map*)FindObject("Map");
 	// 床のモデル番号を取得
-	hGroundModel = pMap->GetModelHandle(0);
+	hMapModel = pMap->GetModelHandle(0);
 
 	RayCastData data;
 	//レイの発射位置
@@ -168,20 +189,20 @@ void Player::Update()
 	//レイの方向
 	data.dir = XMFLOAT3(0, -1, 0);
 	//レイを発射
-	Model::RayCast(hGroundModel, &data);
-	if (!data.hit)
-	{
-		moveFlag_ = noMove;
-		prePos = transform_.position_;
-	}
-	if (data.hit)
-	{
-		if (moveFlag_ != jump)
-		{
-			transform_.position_.y = -data.dist + viewHeigt_;
+	Model::RayCast(hMapModel, &data);
+	//if (!data.hit)
+	//{
+	//	//moveFlag_ = noMove;
+	//	prePos = transform_.position_;
+	//}
+	//if (data.hit)
+	//{
+	//	if (canJump)
+	//	{
+	//		transform_.position_.y = -data.dist;
 
-		}
-	}
+	//	}
+	//}
 
 	if (Input::IsMouseButton(0x00))
 	{
@@ -197,12 +218,20 @@ void Player::Update()
 		pBullet->SetPosition(transform_.position_);
 		pBullet->SetMove(camPos);
 	}
-
+#ifdef DEBUG 
+	static XMFLOAT3 inipos = transform_.position_;
+	if (Input::IsKey(DIK_F))
+	{
+		transform_.position_ = inipos;
+	}
 	//強制終了
 	if (Input::IsKey(DIK_ESCAPE))
 	{
 		PostQuitMessage(0);
 	}
+
+#endif // DEBUG Then
+
 
 }
 
@@ -220,43 +249,44 @@ void Player::Release()
 
 void Player::MovePlayerF()
 {
-	MoveHit(&vPos, vMove, hGroundModel);
+	MoveHit(&vPos, vMove, hMapModel);
 }
 
 void Player::MovePlayerB()
 {
-	MoveHit(&vPos, -vMove, hGroundModel);
+	MoveHit(&vPos, -vMove, hMapModel);
 }
 
 void Player::MovePlayerR()
 {
-	MoveHit(&vPos, vMoveX, hGroundModel);
+	MoveHit(&vPos, vMoveX, hMapModel);
 }
 
 void Player::MovePlayerL()
 {
-	MoveHit(&vPos, -vMoveX, hGroundModel);
+	MoveHit(&vPos, -vMoveX, hMapModel);
 }
 
-void Player::JumpPlayer(){
-	moveFlag_ = noMove;
-	jump_ = { 0,jumpPower_,0 };
-	vJump = XMLoadFloat3(&jump_);
-	if (!IsHit(&vPos, vJump, hModel_))
+void Player::PlayerJump()
+{
+	XMFLOAT3 jump = { 0,jumpPower_,0 };
+	XMVECTOR vJump = XMLoadFloat3(&jump);
+	if (IsHit(vPos, vJump, hMapModel))
+	{
+		if (jumpPower_ >= 0)
+		{
+			jumpPower_ = -gravity_;
+		}
+		else
+		{
+			canJump = true;
+		}
+	}
+	else
 	{
 		vPos += vJump;
 		XMStoreFloat3(&transform_.position_, vPos);
 		jumpPower_ -= gravity_;
-
-		wchar_t buffer[256];
-		swprintf_s(buffer, L"★変数の値は%d\n", jumpPower_);
-		OutputDebugString((LPCSTR)buffer);
-
-	}
-	else
-	{
-		moveFlag_ = noMove;
-
 	}
 
 }
@@ -280,7 +310,6 @@ bool Player::IsHit(XMVECTOR pos, XMVECTOR move, int h_model)
 		return false;
 	}
 	return false;
-
 }
 void Player::CrouchDown()
 {

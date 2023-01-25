@@ -22,7 +22,7 @@ Map::~Map()
 void Map::Initialize()
 {
 	//モデルデータのロード
-	hModel_[0] = Model::Load("WallSample.fbx");
+	hModel_[0] = Model::Load("floor1.fbx");
 	assert(hModel_ >= 0);
 }
 
