@@ -4,6 +4,11 @@
 #include "Map.h"
 #include "CamTarget.h"
 
+
+
+
+#include "Stage.h"
+
 //コンストラクタ
 TestScene::TestScene(GameObject * parent)
 	: GameObject(parent, "TestScene")
@@ -13,10 +18,15 @@ TestScene::TestScene(GameObject * parent)
 //初期化
 void TestScene::Initialize()
 {
-	Instantiate<Map>(this);
+	Instantiate<Stage>(this);
+	//Instantiate<Map>(this);
 	Instantiate<Player>(this); 
 	Instantiate<Enemy>(this);
 	//Instantiate<CamTarget>(this);
+
+
+
+
 
 }
 

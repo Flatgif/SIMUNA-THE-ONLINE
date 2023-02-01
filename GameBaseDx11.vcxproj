@@ -160,6 +160,7 @@
     <ClCompile Include="Item.cpp" />
     <ClCompile Include="Map.cpp" />
     <ClCompile Include="Player.cpp" />
+    <ClCompile Include="Stage.cpp" />
     <ClCompile Include="TestScene.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -190,6 +191,7 @@
     <ClInclude Include="Item.h" />
     <ClInclude Include="Map.h" />
     <ClInclude Include="Player.h" />
+    <ClInclude Include="Stage.h" />
     <ClInclude Include="TestScene.h" />
   </ItemGroup>
   <ItemGroup>

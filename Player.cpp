@@ -5,6 +5,10 @@
 #include "Map.h"
 #include "Bullet.h"
 
+
+#include "Stage.h"
+
+
 //コンストラクタ
 Player::Player(GameObject* parent)
     :GameObject(parent, "Player"), hModel_(-1),moveSpeed_(0.9f),viewHeigt_(10.0f), bulletSpeed_(0.8f)
@@ -22,18 +26,27 @@ Player::~Player()
 void Player::Initialize()
 {	
 	//モデルデータのロード
-	hModel_ = Model::Load("player.fbx");
+	hModel_ = Model::Load("MyModel.fbx");
 	assert(hModel_ >= 0);
-	//画像データのロード
+	
+
+	Stage* pStage = (Stage*)FindObject("Stage");
+	resPosX = pStage->GetPointX();
+	resPosZ = pStage->GetPointZ();
+
+
+	transform_.position_.x = resPosX;
+	transform_.position_.z = resPosZ;
+
 }
 
 //更新
 void Player::Update()
 {
 	//マップオブジェクトを探す
-	Map* pMap = (Map*)FindObject("Map");    
+	Stage* pStage = (Stage*)FindObject("Stage");    
 	// 床のモデル番号を取得
-	int hGroundModel = pMap->GetModelHandle(0);    
+	int hGroundModel = pStage->GetModelHandle(0);    
 	RayCastData data;
 	//レイの発射位置
 	XMFLOAT3 startPos = transform_.position_;

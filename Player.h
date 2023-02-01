@@ -31,6 +31,8 @@ class Player : public GameObject
     float checkYG;          //ジャンプ時のy座標を保存する変数
 
 
+    int resPosX;
+    int resPosZ;
 
 public:
     //コンストラクタ
