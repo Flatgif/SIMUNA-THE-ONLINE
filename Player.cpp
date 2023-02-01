@@ -32,18 +32,20 @@ Player::~Player()
 void Player::Initialize()
 {
 	//モデルデータのロード
-	hModel_ = Model::Load("player1.fbx");
+	hModel_ = Model::Load("player2.fbx");
 	assert(hModel_ >= 0);
 	//マップオブジェクトを探す
 	Map* pMap = (Map*)FindObject("Map");
 	// 床のモデル番号を取得
 	hMapModel = pMap->GetModelHandle(0);
-
 }
 
 //更新
 void Player::Update()
-{		//移動入力処理
+{		
+	static XMFLOAT3 inipos = transform_.position_;
+	prePos = vPos;
+	//移動入力処理
 	if (canJump && Input::IsKeyDown(DIK_SPACE))
 	{
 		canJump = false;
@@ -162,7 +164,6 @@ void Player::Update()
 		pBullet->SetMove(camPos);
 	}
 #ifdef DEBUG 
-	static XMFLOAT3 inipos = transform_.position_;
 	if (Input::IsKey(DIK_F))
 	{
 		transform_.position_ = inipos;
@@ -288,6 +289,11 @@ void Player::MoveHit(XMVECTOR *pos, XMVECTOR move, int h_model)
 	if (data.hit && data.dist <= length && data.dist != 0)
 	{
 		*pos += ScratchWall(data.normal, vPos);
+	}
+	else if (data.hit == false)
+	{
+		*pos = XMVectorSet( 0, 0, 0, 0 );
+		canJump = true;
 	}
 	else
 	{

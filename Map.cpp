@@ -34,11 +34,8 @@ void Map::Update()
 //•`‰æ
 void Map::Draw()
 {
-	for (int i = 0; i < 1; i++)
-	{
-		Model::SetTransform(hModel_[i], transform_);
-		Model::Draw(hModel_[i]);
-	}
+		Model::SetTransform(hModel_[0], transform_);
+		Model::Draw(hModel_[0]);
 }
 
 //ŠJ•ú

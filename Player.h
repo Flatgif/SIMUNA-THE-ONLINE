@@ -42,7 +42,7 @@ class Player : public GameObject
         crouchDown = 1<<4,
     };
     int  moveFlag_;
-    XMFLOAT3 prePos;
+    XMVECTOR prePos;
     XMFLOAT3 move;
     XMFLOAT3 moveX;
     XMVECTOR vMove;
@@ -77,7 +77,6 @@ public:
     bool IsHit(XMVECTOR pos, XMVECTOR move, int h_model);
     void MoveHit(XMVECTOR *pos, XMVECTOR move, int h_model);
     XMVECTOR ScratchWall(XMVECTOR normal, XMVECTOR pos);
-
 
 
 };
