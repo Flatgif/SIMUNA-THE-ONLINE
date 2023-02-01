@@ -5,49 +5,25 @@ class Player : public GameObject
 {
     //モデル番号
     int hModel_;
-    int hMapModel;
-    int second_;
-    //移動スピード
-    float moveSpeed_;
-    float runSpeed_;
-    float crouchDownSpeed_;
+    int hMapModel_;
+    //プレイヤーの位置ベクトル
+    XMVECTOR vPos_;
+    //移動量のベクトル
+    XMVECTOR vMove_;
 
-    bool canJump;
-    float jumpPower_;
-    float jumpPowerDefault_;
-    float gravity_;
-    //視点高さ
-    float viewHeigt_;
-    float defaultHeigt_;
-    float crouchDownHeigt_;
+    XMMATRIX mRotateX_;
+    XMMATRIX mRotate_;
 
-    //弾のスピード
-    float bulletSpeed_;
-    float recoil_;
-
-    typedef struct
-    {
-        float x;
-        float y;
-    }CamSpeed;
-    //カメラ感度設定
-    CamSpeed camSpeed_;
-
-    enum MoveFlag
+    //プレイヤーの状態遷移
+    typedef enum state
     {
         noMove = 1<<0,
-        walk = 1<<1,
-        run = 1<<2,    
-        jump = 1<<3,   
-        crouchDown = 1<<4,
-    };
-    int  moveFlag_;
-    XMVECTOR prePos;
-    XMFLOAT3 move;
-    XMFLOAT3 moveX;
-    XMVECTOR vMove;
-    XMVECTOR vMoveX;
-    XMVECTOR vPos;
+        move = 1<<1,
+
+
+    }playerState;
+    playerState playerstate_;
+
 public:
     //コンストラクタ
     Player(GameObject* parent);
@@ -67,16 +43,25 @@ public:
     //開放
     void Release() override;
 
-    void MovePlayerF();
-    void MovePlayerB();
-    void MovePlayerR();
-    void MovePlayerL();
-    void CrouchDown();
-    void Run();
-    void PlayerJump();
-    bool IsHit(XMVECTOR pos, XMVECTOR move, int h_model);
-    void MoveHit(XMVECTOR *pos, XMVECTOR move, int h_model);
-    XMVECTOR ScratchWall(XMVECTOR normal, XMVECTOR pos);
+    //プレイヤーを移動させる
+    void PlayerMove();
 
 
+    /// <summary>
+    /// 移動量をプレイヤーのポジションに追加していく
+    /// </summary>
+    /// <param name="m">移動量</param>
+    void AddMove(XMVECTOR m) { playerstate_ = move; vMove_ += m; }
+
+    /// <summary>
+    /// モデルとの当たり判定
+    /// </summary>
+    /// <param name="h_model">当たり判定をするモデル</param>
+    /// <returns></returns>
+    bool IsHit(int h_model);
+
+    //プレイヤーに追従するカメラ呼び出し
+    void CallCam();
+
+    void ViewRotate();
 };
