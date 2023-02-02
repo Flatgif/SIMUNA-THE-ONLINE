@@ -150,6 +150,7 @@
     <ClCompile Include="Engine\Transform.cpp" />
     <ClCompile Include="Item.cpp" />
     <ClCompile Include="Map.cpp" />
+    <ClCompile Include="Math.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="TestScene.cpp" />
   </ItemGroup>
@@ -179,6 +180,7 @@
     <ClInclude Include="Engine\Transform.h" />
     <ClInclude Include="Item.h" />
     <ClInclude Include="Map.h" />
+    <ClInclude Include="Math.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="TestScene.h" />
   </ItemGroup>

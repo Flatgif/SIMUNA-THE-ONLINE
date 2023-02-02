@@ -581,7 +581,7 @@ bool FbxParts::GetBonePosition(std::string boneName, XMFLOAT3 * position)
 	return false;
 }
 
-void FbxParts::RayCast(RayCastData * data)
+void FbxParts::RayCast(RayCastData* data)
 {
 	data->hit = FALSE;
 

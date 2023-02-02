@@ -43,10 +43,8 @@ void Map::Draw()
 		Model::Draw(hModel_[i]);
 	}
 }
+
 //ŠJ•ú
 void Map::Release()
 {
 }
-
-
-

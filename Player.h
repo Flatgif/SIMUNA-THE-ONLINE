@@ -10,16 +10,19 @@ class Player : public GameObject
     XMVECTOR vPos_;
     //移動量のベクトル
     XMVECTOR vMove_;
+    float dashSpeed_;
+
 
     XMMATRIX mRotateX_;
     XMMATRIX mRotate_;
 
+    float camDist_;
     //プレイヤーの状態遷移
     typedef enum state
     {
         noMove = 1<<0,
         move = 1<<1,
-
+        dash = 1<<2,
 
     }playerState;
     playerState playerstate_;
@@ -62,6 +65,8 @@ public:
 
     //プレイヤーに追従するカメラ呼び出し
     void CallCam();
-
+    
+    //カメラの視点マウスにする
     void ViewRotate();
+
 };
