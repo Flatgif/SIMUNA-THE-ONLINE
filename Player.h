@@ -1,5 +1,6 @@
 #pragma once
 #include "Engine/GameObject.h"
+#include "Engine/Model.h"
 
 class Player : public GameObject
 {
@@ -49,6 +50,8 @@ public:
     //プレイヤーを移動させる
     void PlayerMove();
 
+    void PlayerSlideMove();
+
 
     /// <summary>
     /// 移動量をプレイヤーのポジションに追加していく
@@ -61,7 +64,7 @@ public:
     /// </summary>
     /// <param name="h_model">当たり判定をするモデル</param>
     /// <returns></returns>
-    bool IsHit(int h_model);
+    bool IsHit(int h_model, RayCastData* data);
 
     //プレイヤーに追従するカメラ呼び出し
     void CallCam();
@@ -69,4 +72,7 @@ public:
     //カメラの視点マウスにする
     void ViewRotate();
 
+    XMVECTOR ScratchWall(XMVECTOR normal, XMVECTOR pos);
+
+    
 };

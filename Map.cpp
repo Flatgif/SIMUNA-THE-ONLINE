@@ -22,11 +22,11 @@ Map::~Map()
 void Map::Initialize()
 {
 	//モデルデータのロード
-	hModel_[0] = Model::Load("Stage.fbx");
+	hModel_[0] = Model::Load("floor.fbx");
 	assert(hModel_ >= 0);
 	hModel_[1] = Model::Load("Wall.fbx");
 	assert(hModel_ >= 0);
-	transform_.rotate_.x = -90;
+	transform_.scale_ = { 10,10,10 };
 }
 
 //更新
@@ -37,7 +37,7 @@ void Map::Update()
 //描画
 void Map::Draw()
 {
-	for (int i = 0; i < 2; i++)
+	for (int i = 0; i < 1; i++)
 	{
 		Model::SetTransform(hModel_[i], transform_);
 		Model::Draw(hModel_[i]);

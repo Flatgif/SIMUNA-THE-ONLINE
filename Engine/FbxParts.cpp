@@ -607,7 +607,7 @@ void FbxParts::RayCast(RayCastData* data)
 			{
 				XMVECTOR v1, v2, n;
 				v1 = XMLoadFloat3(&ver[1]) - XMLoadFloat3(&ver[0]);
-				v2 = XMLoadFloat3(&ver[2]) - XMLoadFloat3(&ver[1]);
+				v2 = XMLoadFloat3(&ver[2]) - XMLoadFloat3(&ver[0]);
 				n = XMVector3Cross(v2, v1);
 				data->normal = n;
 

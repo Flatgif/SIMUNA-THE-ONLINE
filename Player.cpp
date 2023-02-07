@@ -1,6 +1,5 @@
 #include "Player.h"
 #include "Engine/Input.h"
-#include "Engine/Model.h"
 #include "Engine/Camera.h"
 #include "Map.h"
 #include "Bullet.h"
@@ -12,7 +11,7 @@
 
 //コンストラクタ
 Player::Player(GameObject* parent)
-	:GameObject(parent, "Player"), hModel_(-1), hMapModel_(-1), camDist_(0), dashSpeed_(10.0f)
+	:GameObject(parent, "Player"), hModel_(-1), hMapModel_(-1), camDist_(0), dashSpeed_(0.1f)
 {
 }
 
@@ -30,7 +29,7 @@ void Player::Initialize()
 	//マップオブジェクトを探す
 	Map* pMap = (Map*)FindObject("Map");
 	// 床のモデル番号を取得
-	hMapModel_ = pMap->GetModelHandle(1);
+	hMapModel_ = pMap->GetModelHandle(0);
 }
 
 //更新
@@ -42,7 +41,8 @@ void Player::Update()
 	//移動量
 	XMVECTOR moveX = { 1, 0, 0, 0 };
 	XMVECTOR moveZ = { 0, 0, 1, 0 };
-
+	moveX = XMVector3TransformCoord(moveX, mRotate_);
+	moveZ = XMVector3TransformCoord(moveZ, mRotate_);
 	//移動入力処理
 	if (Input::IsKey(DIK_LSHIFT) || Input::IsKey(DIK_RSHIFT))
 	{
@@ -72,18 +72,12 @@ void Player::Update()
 	switch (playerstate_)
 	{
 	case move:
-		if (IsHit(hMapModel_))
-		{
-			playerstate_ = noMove;
-		}
-		else
-		{
-			PlayerMove();
-		}
-
+		PlayerSlideMove();
+		break;
 	case dash:
 		
 	default:
+		Math::EaseOut(&dashSpeed_, 0.01f, 0.1f);
 		break;
 	}
 	XMStoreFloat3(&transform_.position_, vPos_);
@@ -93,7 +87,7 @@ void Player::Update()
 
 	if (Input::IsKey(DIK_Q))
 	{
-		dashSpeed_ = 0.0f;
+		dashSpeed_ = 1.0f;
 	}
 
 }
@@ -112,23 +106,38 @@ void Player::Release()
 
 void Player::PlayerMove()
 {
-	vMove_ = XMVector3TransformCoord(vMove_, mRotate_);
 	vMove_ = XMVector3Normalize(vMove_);
-	vMove_ *= Math::EaseIn(&dashSpeed_,-0.1f,0.0f);
+	//vMove_ *= Math::EaseIn(&dashSpeed_,0.01f,3);
 	vPos_ += vMove_;
 	vMove_ = XMVectorSet(0, 0, 0, 0);
-	
 	playerstate_ = noMove;
+	
 }
 
-bool Player::IsHit(int h_model)
+void Player::PlayerSlideMove()
 {
-	float length = XMVectorGetX(vMove_);
 	RayCastData data;
-	XMStoreFloat3(&data.start, vPos_);
-	XMStoreFloat3(&data.dir, vMove_);
-	Model::RayCast(h_model, &data);
-	if (data.hit && data.dist < length)
+	
+	if (IsHit(hMapModel_, &data))
+	{
+		vMove_ = ScratchWall(data.normal, vMove_);
+	}
+	vPos_ += vMove_;
+	vMove_ = XMVectorSet(0, 0, 0, 0);
+	playerstate_ = noMove;
+
+
+}
+
+bool Player::IsHit(int h_model,RayCastData* data)
+{
+
+	XMVECTOR length = XMVector3Length(vMove_);
+	float leng = XMVectorGetX(length);
+	XMStoreFloat3(&data->start, vPos_);
+	XMStoreFloat3(&data->dir, vMove_);
+	Model::RayCast(h_model, &*data);
+	if (data->dist * leng <= leng)
 	{
 		return true;
 	}
@@ -136,7 +145,6 @@ bool Player::IsHit(int h_model)
 	{
 		return false;
 	}
-	return false;
 }
 
 void Player::CallCam()
@@ -145,7 +153,7 @@ void Player::CallCam()
 
 	XMFLOAT3 camPos;
 	//Cameraの位置
-	XMVECTOR vCam = XMVectorSet(0, 0, -0.0001 + camDist_, 0);
+	XMVECTOR vCam = XMVectorSet(0, 0, -0.0001f + camDist_, 0);
 
 	vCam = XMVector3TransformCoord(vCam, mRotateX_);
 	vCam = XMVector3TransformCoord(vCam, mRotate_);
@@ -188,3 +196,12 @@ void Player::ViewRotate()
 
 }
 
+XMVECTOR Player::ScratchWall(XMVECTOR normal, XMVECTOR pos)
+{
+	XMVECTOR delY = XMVectorSet( 1, 0, 1, 1 );
+	normal = XMVector3Normalize(normal);
+	XMVECTOR result =	XMVector3Normalize(pos - XMVector3Dot(pos, normal) * normal);
+	result *= delY;
+	return result;
+
+}
