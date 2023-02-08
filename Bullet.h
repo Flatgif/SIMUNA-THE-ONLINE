@@ -1,5 +1,7 @@
 #pragma once
 #include "Engine/GameObject.h"
+#include "Map.h"
+#include "Engine/Model.h"
 
 //◆◆◆を管理するクラス
 class Bullet : public GameObject
@@ -9,6 +11,7 @@ class Bullet : public GameObject
     //移動量
     XMFLOAT3 move_; 
     float bulletLanding_;
+    int hMapModel_;
 public:
     //コンストラクタ
     Bullet(GameObject* parent);
@@ -30,5 +33,7 @@ public:
 
     //移動量セット
     void SetMove(XMFLOAT3 move) { move_ = move; }
+
+    bool Hit(XMVECTOR move ,int h_model, RayCastData* data);
 
 };

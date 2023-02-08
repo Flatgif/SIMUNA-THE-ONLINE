@@ -22,6 +22,9 @@ void Bullet::Initialize()
     assert(hModel_ >= 0);
     transform_.scale_ = XMFLOAT3(0.5f, 0.5f, 0.5f);
    // Instantiate<Item>(this);
+    Map* pMap = (Map*)FindObject("Map");
+    // è∞ÇÃÉÇÉfÉãî‘çÜÇéÊìæ
+    hMapModel_ = pMap->GetModelHandle(0);
 }
 
 //çXêV
@@ -31,13 +34,15 @@ void Bullet::Update()
     XMMATRIX mRotate =XMMatrixRotationY(XMConvertToRadians(transform_.rotate_.y));
     XMVECTOR vPos = XMLoadFloat3(&transform_.position_);
     move_.y -= bulletLanding_;
-    vPos += vMove;
-    if (Input::IsKey(DIK_RSHIFT) || Input::IsKey(DIK_LSHIFT))
+    RayCastData data;
+    if (Hit(vMove, hMapModel_, &data))
     {
-        vPos += vMove;
-    }
-    XMStoreFloat3(&transform_.position_, vPos);
+        vMove = XMVector3Normalize(data.normal);
+        XMStoreFloat3(&move_, vMove);
 
+    }
+    vPos += vMove;
+    XMStoreFloat3(&transform_.position_, vPos);
     int num = 200;
     if (transform_.position_.y <= -num || transform_.position_.y >= num ||
         transform_.position_.x <= -num || transform_.position_.x >= num ||
@@ -60,3 +65,22 @@ void Bullet::Draw()
 void Bullet::Release()
 {
 }
+
+bool Bullet::Hit(XMVECTOR move,int h_model, RayCastData* data)
+{
+    XMVECTOR vPos = XMLoadFloat3(&transform_.position_);
+    XMVECTOR length = XMVector3Length(move);
+    float leng = XMVectorGetX(length);
+    XMStoreFloat3(&data->start, vPos);
+    XMStoreFloat3(&data->dir, move);
+    Model::RayCast(h_model, &*data);
+    if (data->dist * leng <= leng)
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+

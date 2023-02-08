@@ -11,7 +11,7 @@
 
 //コンストラクタ
 Player::Player(GameObject* parent)
-	:GameObject(parent, "Player"), hModel_(-1), hMapModel_(-1), camDist_(0), dashSpeed_(0.1f),height_(10)
+	:GameObject(parent, "Player"), hModel_(-1), hMapModel_(-1), camDist_(0), dashSpeed_(0.1f)
 {
 }
 
@@ -157,7 +157,7 @@ void Player::CallCam()
 
 	XMFLOAT3 camPos;
 	//Cameraの位置
-	XMVECTOR vCam = XMVectorSet(0, transform_.position_.y+height_, -0.0001f + camDist_, 0);
+	XMVECTOR vCam = XMVectorSet(0, transform_.position_.y, -0.0001f + camDist_, 0);
 
 	vCam = XMVector3TransformCoord(vCam, mRotateX_);
 	vCam = XMVector3TransformCoord(vCam, mRotate_);
@@ -166,10 +166,9 @@ void Player::CallCam()
 
 	XMVECTOR myself = XMLoadFloat3(&camPos);
 	XMVECTOR target = XMLoadFloat3(&transform_.position_);
-	XMFLOAT3 tage = transform_.position_;
-	tage.y = height_;
+
 	Camera::SetPosition(camPos);
-	Camera::SetTarget(tage);
+	Camera::SetTarget(transform_.position_);
 }
 
 void Player::ViewRotate()
@@ -203,9 +202,9 @@ void Player::ViewRotate()
 
 XMVECTOR Player::ScratchWall(XMVECTOR normal, XMVECTOR pos)
 {
-	XMVECTOR delY = XMVectorSet( 1, 0, 1, 1 );
+	XMVECTOR delY = XMVectorSet( 1, 0, 1, 0 );
 	normal = XMVector3Normalize(normal);
-	XMVECTOR result =	XMVector3Normalize(pos - XMVector3Dot(pos, normal) * normal);
+	XMVECTOR result =pos - XMVector3Dot(pos, normal) * normal;
 	result *= delY;
 	return result;
 
