@@ -1,6 +1,6 @@
 #pragma once
 #include "Engine/GameObject.h"
-#include "Map.h"
+#include "Stage.h"
 #include "Engine/Model.h"
 
 //◆◆◆を管理するクラス
@@ -11,7 +11,7 @@ class Bullet : public GameObject
     //移動量
     XMFLOAT3 move_; 
     float bulletLanding_;
-    int hMapModel_;
+    int hMapModel_[4];
 public:
     //コンストラクタ
     Bullet(GameObject* parent);

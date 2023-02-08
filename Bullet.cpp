@@ -24,7 +24,10 @@ void Bullet::Initialize()
    // Instantiate<Item>(this);
     Stage* pStage = (Stage*)FindObject("Stage");
     // è∞ÇÃÉÇÉfÉãî‘çÜÇéÊìæ
-    hMapModel_ = pStage->GetModelHandle(0);
+	for (int i = 0; i < 4; i++)
+	{
+		hMapModel_[i] = pStage->GetModelHandle(i);
+	}
 }
 
 //çXêV
@@ -35,9 +38,13 @@ void Bullet::Update()
     XMVECTOR vPos = XMLoadFloat3(&transform_.position_);
     move_.y -= bulletLanding_;
     RayCastData data;
-    if (Hit(vMove, hMapModel_, &data))
+    if (Hit(vMove, hMapModel_[0], &data)
+        || Hit(vMove, hMapModel_[1], &data)
+        || Hit(vMove, hMapModel_[2], &data)
+        || Hit(vMove, hMapModel_[3], &data))
     {
-        vMove = XMVector3Normalize(data.normal);
+        vMove = 0.1f*XMVector3Normalize(data.normal);
+
         XMStoreFloat3(&move_, vMove);
 
     }

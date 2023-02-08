@@ -11,6 +11,7 @@ Stage::Stage(GameObject* parent)
     {
         hModel_[i] = -1;
     }
+
 }
 
 //デストラクタ
@@ -51,6 +52,7 @@ void Stage::Initialize()
             }
         }
     }
+
 }
 
 //更新
@@ -69,6 +71,7 @@ void Stage::Draw()
 
         {
             int type = map_[x][z]; //&&どっちも揃ったら マップにブロックの処理
+            transform_.position_.x = x;                    //～個マス壁配置
             transform_.position_.z = z;                   //～個マス壁配置
             Model::SetTransform(hModel_[type], transform_); //配列[0]か[1]で壁か床か調整できる
             Model::Draw(hModel_[type]);                    //配列[0]か[1]で壁か床か調整できる

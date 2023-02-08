@@ -94,9 +94,9 @@
     <ClCompile Include="Enemy.cpp" />
     <ClCompile Include="Item.cpp" />
     <ClCompile Include="Bullet.cpp" />
-    <ClCompile Include="Map.cpp" />
     <ClCompile Include="Math.cpp" />
     <ClCompile Include="Stage.cpp" />
+    <ClCompile Include="PlayerHead.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\BoxCollider.h">
@@ -167,9 +167,9 @@
     <ClInclude Include="Enemy.h" />
     <ClInclude Include="Item.h" />
     <ClInclude Include="Bullet.h" />
-    <ClInclude Include="Map.h" />
     <ClInclude Include="Math.h" />
     <ClInclude Include="Stage.h" />
+    <ClInclude Include="PlayerHead.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Assets\Shader\Simple2D.hlsl">

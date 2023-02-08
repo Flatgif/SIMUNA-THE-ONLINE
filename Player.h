@@ -15,7 +15,6 @@ class Player : public GameObject
     float moveSpeed_;
     XMMATRIX mRotateX_;
     XMMATRIX mRotate_;
-
     float camDist_;
     //ƒvƒŒƒCƒ„[‚Ìó‘Ô‘JˆÚ
     typedef enum state
@@ -74,4 +73,6 @@ public:
     XMVECTOR ScratchWall(XMVECTOR normal, XMVECTOR pos);
 
     void shoot();
+
+
 };

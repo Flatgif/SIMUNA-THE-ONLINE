@@ -11,7 +11,7 @@
 
 //コンストラクタ
 Player::Player(GameObject* parent)
-	:GameObject(parent, "Player"), hModel_(-1), camDist_(0), dashSpeed_(0.1f),moveSpeed_(0.8f)
+	:GameObject(parent, "Player"), hModel_(-1), camDist_(0), dashSpeed_(0.1f),moveSpeed_(0.5f)
 {
 }
 
@@ -124,10 +124,12 @@ void Player::PlayerSlideMove()
 {
 	RayCastData data;
 	
-	if (IsHit(hMapModel_[0], &data)|| IsHit(hMapModel_[1], &data)||IsHit(hMapModel_[2], &data)|| IsHit(hMapModel_[3], &data))
+	if ( IsHit(hMapModel_[1], &data)||IsHit(hMapModel_[2], &data))
 	{
 		vMove_ = ScratchWall(data.normal, vMove_);
+		//vMove_ *= 0;
 	}
+	vMove_ *= moveSpeed_;
 	vPos_ += vMove_;
 	vMove_ = XMVectorSet(0, 0, 0, 0);
 	playerstate_ = noMove;
@@ -194,12 +196,10 @@ void Player::ViewRotate()
 	//x軸で()度回転;
 	mRotateX_ = XMMatrixRotationX(XMConvertToRadians(transform_.rotate_.x));
 
-
 #ifdef DEBUG
-	camDist_ += mouseMove.z/10;
+	camDist_ += mouseMove.z / 10;
 	if (camDist_ > 0)camDist_ = 0;
 #endif // DEBUG
-
 }
 
 XMVECTOR Player::ScratchWall(XMVECTOR normal, XMVECTOR pos)
