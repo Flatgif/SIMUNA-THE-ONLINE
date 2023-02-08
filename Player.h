@@ -12,7 +12,7 @@ class Player : public GameObject
     //ˆÚ“®—Ê‚ÌƒxƒNƒgƒ‹
     XMVECTOR vMove_;
     float dashSpeed_;
-
+    float height_;
 
     XMMATRIX mRotateX_;
     XMMATRIX mRotate_;
@@ -74,5 +74,5 @@ public:
 
     XMVECTOR ScratchWall(XMVECTOR normal, XMVECTOR pos);
 
-    
+    void shoot();
 };

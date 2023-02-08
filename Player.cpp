@@ -11,7 +11,7 @@
 
 //コンストラクタ
 Player::Player(GameObject* parent)
-	:GameObject(parent, "Player"), hModel_(-1), hMapModel_(-1), camDist_(0), dashSpeed_(0.1f)
+	:GameObject(parent, "Player"), hModel_(-1), hMapModel_(-1), camDist_(0), dashSpeed_(0.1f),height_(10)
 {
 }
 
@@ -66,7 +66,11 @@ void Player::Update()
 		AddMove(moveX);
 
 	}
-	
+	if (Input::IsMouseButton(0x00))
+	{
+		shoot();
+	}
+
 
 
 	switch (playerstate_)
@@ -153,7 +157,7 @@ void Player::CallCam()
 
 	XMFLOAT3 camPos;
 	//Cameraの位置
-	XMVECTOR vCam = XMVectorSet(0, 0, -0.0001f + camDist_, 0);
+	XMVECTOR vCam = XMVectorSet(0, transform_.position_.y+height_, -0.0001f + camDist_, 0);
 
 	vCam = XMVector3TransformCoord(vCam, mRotateX_);
 	vCam = XMVector3TransformCoord(vCam, mRotate_);
@@ -162,9 +166,10 @@ void Player::CallCam()
 
 	XMVECTOR myself = XMLoadFloat3(&camPos);
 	XMVECTOR target = XMLoadFloat3(&transform_.position_);
-
+	XMFLOAT3 tage = transform_.position_;
+	tage.y = height_;
 	Camera::SetPosition(camPos);
-	Camera::SetTarget(transform_.position_);
+	Camera::SetTarget(tage);
 }
 
 void Player::ViewRotate()
@@ -203,5 +208,22 @@ XMVECTOR Player::ScratchWall(XMVECTOR normal, XMVECTOR pos)
 	XMVECTOR result =	XMVector3Normalize(pos - XMVector3Dot(pos, normal) * normal);
 	result *= delY;
 	return result;
+
+}
+
+void Player::shoot()
+{
+	XMFLOAT3 camPos = Camera::GetPosition();
+	XMVECTOR vCam = XMLoadFloat3(&camPos);
+	Bullet* pBullet = Instantiate<Bullet>(GetParent()->GetParent());
+	XMFLOAT3 bulletPos = transform_.position_;
+	XMVECTOR move = (XMLoadFloat3(&bulletPos) - vCam);
+	//このままだと大砲の長さで弾の速度が決まるのでベクトルを正規化
+	move = XMVector3Normalize(move);
+	//正規化して長さ1の単位ベクトルにした値にかけてあげたりすることで調整できる
+	move *= 0.8f;
+	XMStoreFloat3(&camPos, move);
+	pBullet->SetPosition(transform_.position_);
+	pBullet->SetMove(camPos);
 
 }

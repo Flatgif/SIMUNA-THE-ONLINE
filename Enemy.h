@@ -6,13 +6,14 @@
 //◆◆◆を管理するクラス
 class Enemy : public GameObject
 {
+    int hModel_;
     typedef struct Status
     {
         XMFLOAT3 pos;
         XMVECTOR dir;
         bool shootFlag;
     }EnemyInfo;
-    std::vector<EnemyInfo> enemy;
+    EnemyInfo enemy;
 public:
     //コンストラクタ
     Enemy(GameObject* parent);
@@ -34,4 +35,7 @@ public:
 
     //受信
     void Reception();
+
+    //向き方向に回転
+    float Calculate();
 };

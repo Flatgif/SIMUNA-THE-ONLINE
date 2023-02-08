@@ -20,7 +20,7 @@ void Bullet::Initialize()
     //モデルデータのロード
     hModel_ = Model::Load("player.fbx");
     assert(hModel_ >= 0);
-    transform_.scale_ = XMFLOAT3(0.05f, 0.05f, 0.05f);
+    transform_.scale_ = XMFLOAT3(0.5f, 0.5f, 0.5f);
    // Instantiate<Item>(this);
 }
 
