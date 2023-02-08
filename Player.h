@@ -6,13 +6,13 @@ class Player : public GameObject
 {
     //モデル番号
     int hModel_;
-    int hMapModel_;
+    int hMapModel_[4];
     //プレイヤーの位置ベクトル
     XMVECTOR vPos_;
     //移動量のベクトル
     XMVECTOR vMove_;
     float dashSpeed_;
-
+    float moveSpeed_;
     XMMATRIX mRotateX_;
     XMMATRIX mRotate_;
 

@@ -1,7 +1,7 @@
 #include "Player.h"
 #include "Engine/Input.h"
 #include "Engine/Camera.h"
-#include "Map.h"
+#include "Stage.h"
 #include "Bullet.h"
 #include <corecrt_math_defines.h>
 #include "Math.h"
@@ -11,7 +11,7 @@
 
 //コンストラクタ
 Player::Player(GameObject* parent)
-	:GameObject(parent, "Player"), hModel_(-1), hMapModel_(-1), camDist_(0), dashSpeed_(0.1f)
+	:GameObject(parent, "Player"), hModel_(-1), camDist_(0), dashSpeed_(0.1f),moveSpeed_(0.8f)
 {
 }
 
@@ -24,12 +24,14 @@ Player::~Player()
 void Player::Initialize()
 {
 	//モデルデータのロード
-	hModel_ = Model::Load("player2.fbx");
+	hModel_ = Model::Load("Player.fbx");
 	assert(hModel_ >= 0);
 	//マップオブジェクトを探す
-	Map* pMap = (Map*)FindObject("Map");
-	// 床のモデル番号を取得
-	hMapModel_ = pMap->GetModelHandle(0);
+	Stage* pStage = (Stage*)FindObject("Stage");
+	for (int i = 0; i < 4; i++)
+	{
+		hMapModel_[i] = pStage->GetModelHandle(i);
+	}
 }
 
 //更新
@@ -111,7 +113,7 @@ void Player::Release()
 void Player::PlayerMove()
 {
 	vMove_ = XMVector3Normalize(vMove_);
-	//vMove_ *= Math::EaseIn(&dashSpeed_,0.01f,3);
+	vMove_ *= moveSpeed_;
 	vPos_ += vMove_;
 	vMove_ = XMVectorSet(0, 0, 0, 0);
 	playerstate_ = noMove;
@@ -122,7 +124,7 @@ void Player::PlayerSlideMove()
 {
 	RayCastData data;
 	
-	if (IsHit(hMapModel_, &data))
+	if (IsHit(hMapModel_[0], &data)|| IsHit(hMapModel_[1], &data)||IsHit(hMapModel_[2], &data)|| IsHit(hMapModel_[3], &data))
 	{
 		vMove_ = ScratchWall(data.normal, vMove_);
 	}

@@ -2,7 +2,7 @@
 #include "Item.h"
 #include "Engine/Input.h"
 #include "Engine/Model.h"
-
+#include "Stage.h"
 //コンストラクタ
 Bullet::Bullet(GameObject* parent)
     :GameObject(parent, "Bullet"), hModel_(-1), move_(XMFLOAT3(0.1f, 0, 0)), bulletLanding_(0.00001f)
@@ -22,9 +22,9 @@ void Bullet::Initialize()
     assert(hModel_ >= 0);
     transform_.scale_ = XMFLOAT3(0.5f, 0.5f, 0.5f);
    // Instantiate<Item>(this);
-    Map* pMap = (Map*)FindObject("Map");
+    Stage* pStage = (Stage*)FindObject("Stage");
     // 床のモデル番号を取得
-    hMapModel_ = pMap->GetModelHandle(0);
+    hMapModel_ = pStage->GetModelHandle(0);
 }
 
 //更新
