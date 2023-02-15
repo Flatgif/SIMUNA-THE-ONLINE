@@ -7,12 +7,12 @@
 
 static std::string FormatString(const char* format, ...)
 {
-    static char buffer[1024];
+    static char buff[1024];
     va_list marker;
     va_start(marker, format);
-    vsprintf_s(buffer, format, marker);
+    vsprintf_s(buff, format, marker);
     va_end(marker);
-    return buffer;
+    return buff;
 }
 
 
@@ -25,7 +25,7 @@ Client::Client(const std::string& hostname_, int port_, bool useDelay)
     // ソケットの作成
     sock = (int)socket(AF_INET, SOCK_STREAM, 0);
     if (sock == -1) {
-        throw std::runtime_error("Failed to create a socket.");
+        throw std::runtime_error("ソケットの作成に失敗");
     }
     isClosed = false;
 
@@ -47,7 +47,7 @@ Client::Client(const std::string& hostname_, int port_, bool useDelay)
     if (addr.s_addr == -1) {
         hostent* host = gethostbyname(hostname.c_str());
         if (!host) {
-            throw std::runtime_error("Failed to get a host entry.");
+            throw std::runtime_error("ホストが取得できない");
         }
         memcpy(&addr, (in_addr*)*host->h_addr_list, sizeof(in_addr));
     }
@@ -99,12 +99,12 @@ bool Client::IsConnected() const
     return !isClosed;
 }
 
-bool Client::Receive(int sock, struct MyStruct* data, struct sockaddr_in* fromAddr)
+bool Client::Receive(int sock,MyStruct* data,sockaddr_in* fromAddr)
 {
-    int fromlen = sizeof(struct sockaddr_in);
-    struct MyStruct recvData;
+    int fromlen = sizeof(sockaddr_in);
+    MyStruct recvData;
 
-    int ret = recvfrom(sock, (char*)&recvData, sizeof(recvData), 0, (struct sockaddr*)fromAddr, &fromlen);
+    int ret = recvfrom(sock, (char*)&recvData, sizeof(recvData), 0, (sockaddr*)fromAddr, &fromlen);
     data->pos.x = ntohl(recvData.pos.x);
     data->pos.y = ntohl(recvData.pos.y);
     data->pos.z = ntohl(recvData.pos.z);
@@ -116,7 +116,7 @@ bool Client::Receive(int sock, struct MyStruct* data, struct sockaddr_in* fromAd
 }
 
 
-bool Client::Send(int sock, struct MyStruct data, struct sockaddr_in toAddr)
+bool Client::Send(int sock, struct MyStruct data,sockaddr_in toAddr)
 {
     struct MyStruct sendData;
 
@@ -129,7 +129,7 @@ bool Client::Send(int sock, struct MyStruct data, struct sockaddr_in toAddr)
     sendData.dir.z = htonl(data.dir.z);
 
     int tolen = sizeof(toAddr);
-    int ret = sendto(sock, (char*)&sendData, sizeof(sendData), 0, (struct sockaddr*)&toAddr, tolen);
+    int ret = sendto(sock, (char*)&sendData, sizeof(sendData), 0, (sockaddr*)&toAddr, tolen);
     return true;
 }
 

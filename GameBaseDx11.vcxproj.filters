@@ -24,7 +24,7 @@
       <UniqueIdentifier>{47a6a3f5-8cfd-436b-8d58-beccd108f3f3}</UniqueIdentifier>
       <Extensions>hlsl</Extensions>
     </Filter>
-    <Filter Include="NewFilter1">
+    <Filter Include="Game">
       <UniqueIdentifier>{d6192660-1131-4292-9e53-a48dfaec9f44}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -93,28 +93,28 @@
       <Filter>01Engine\ResourceManager</Filter>
     </ClCompile>
     <ClCompile Include="Bullet.cpp">
-      <Filter>NewFilter1</Filter>
+      <Filter>Game</Filter>
     </ClCompile>
     <ClCompile Include="Enemy.cpp">
-      <Filter>NewFilter1</Filter>
+      <Filter>Game</Filter>
     </ClCompile>
     <ClCompile Include="Item.cpp">
-      <Filter>NewFilter1</Filter>
+      <Filter>Game</Filter>
     </ClCompile>
     <ClCompile Include="Math.cpp">
-      <Filter>NewFilter1</Filter>
+      <Filter>Game</Filter>
     </ClCompile>
     <ClCompile Include="Player.cpp">
-      <Filter>NewFilter1</Filter>
+      <Filter>Game</Filter>
     </ClCompile>
     <ClCompile Include="PlayerHead.cpp">
-      <Filter>NewFilter1</Filter>
+      <Filter>Game</Filter>
     </ClCompile>
     <ClCompile Include="Stage.cpp">
-      <Filter>NewFilter1</Filter>
+      <Filter>Game</Filter>
     </ClCompile>
     <ClCompile Include="TestScene.cpp">
-      <Filter>NewFilter1</Filter>
+      <Filter>Game</Filter>
     </ClCompile>
     <ClCompile Include="Server.cpp" />
     <ClCompile Include="Client.cpp" />
@@ -184,28 +184,28 @@
       <Filter>01Engine\ResourceManager</Filter>
     </ClInclude>
     <ClInclude Include="Bullet.h">
-      <Filter>NewFilter1</Filter>
+      <Filter>Game</Filter>
     </ClInclude>
     <ClInclude Include="Enemy.h">
-      <Filter>NewFilter1</Filter>
+      <Filter>Game</Filter>
     </ClInclude>
     <ClInclude Include="Item.h">
-      <Filter>NewFilter1</Filter>
+      <Filter>Game</Filter>
     </ClInclude>
     <ClInclude Include="Math.h">
-      <Filter>NewFilter1</Filter>
+      <Filter>Game</Filter>
     </ClInclude>
     <ClInclude Include="Player.h">
-      <Filter>NewFilter1</Filter>
+      <Filter>Game</Filter>
     </ClInclude>
     <ClInclude Include="PlayerHead.h">
-      <Filter>NewFilter1</Filter>
+      <Filter>Game</Filter>
     </ClInclude>
     <ClInclude Include="Stage.h">
-      <Filter>NewFilter1</Filter>
+      <Filter>Game</Filter>
     </ClInclude>
     <ClInclude Include="TestScene.h">
-      <Filter>NewFilter1</Filter>
+      <Filter>Game</Filter>
     </ClInclude>
     <ClInclude Include="Server.h" />
     <ClInclude Include="Client.h" />

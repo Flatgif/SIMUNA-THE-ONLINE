@@ -1,5 +1,6 @@
 #ifndef Client_h
 #define Client_h
+#include "Engine/Main.cpp"
 
 #include <queue>
 #include <string>
@@ -7,7 +8,6 @@
 #include <WinSock2.h>
 #include <WS2tcpip.h>
 #include <BaseTsd.h>
-#include "Engine/Main.cpp"
 typedef SSIZE_T ssize_t;
 
 static const int BuffSize = 1024;
@@ -26,9 +26,9 @@ public:
     Client(int sock, sockaddr_in& clientAddr);
     ~Client();
     struct MyStruct {
-        Vec3 pos;	// ˆÊ’u
-        Vec3 dir;	// Œü‚¢‚Ä‚é•ûŒü
-        bool shootFlag;//Œ‚‚Á‚Ä‚¢‚é‚©‚Ç‚¤‚©
+        Vec3 pos;	
+        Vec3 dir;	
+        bool shootFlag;
     };
     std::string GetRemoteHost() const;
     int         GetRemotePort() const;
