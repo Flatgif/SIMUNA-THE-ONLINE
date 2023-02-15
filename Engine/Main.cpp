@@ -4,6 +4,10 @@
 #include <stdlib.h>
 #include <assert.h>
 #include <time.h>
+#include <WinSock2.h>
+#include <WS2tcpip.h>
+#include <iostream>
+
 
 #include "global.h"
 #include "RootObject.h"
@@ -14,7 +18,6 @@
 #include "Audio.h"
 #include "FbxParts.h"
 #include "Global.h"
-
 #pragma comment(lib,"Winmm.lib")
 
 //定数宣言
@@ -22,6 +25,15 @@ const char* WIN_CLASS_NAME = "SampleGame";	//ウィンドウクラス名
 const int reticuleRadius = 8;
 const auto max = 16;
 const auto cbSize = sizeof(DISPLAY_DEVICE);
+const unsigned short SERVER_PORT = 8080;
+int sock;
+struct Vec3 {
+	int x;
+	int y;
+	int z;
+};
+
+
 
 //プロトタイプ宣言
 HWND InitApp(HINSTANCE hInstance, int screenWidth, int screenHeight, int nCmdShow);
@@ -91,6 +103,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	Audio::Initialize();
 
 
+
+
 	//ルートオブジェクト準備
 	//すべてのゲームオブジェクトの親となるオブジェクト
 	RootObject* pRootObject = new RootObject;
@@ -130,7 +144,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 					wsprintf(string, "FPS:%d", FPS);
 					SetWindowText(GetActiveWindow(), string);
 					FPS = 0;
-					lastFpsResetTime = nowTime;
 				}
 			}
 
@@ -258,6 +271,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	case WM_MOUSEMOVE:
 		Input::SetMousePosition(LOWORD(lParam), HIWORD(lParam));
 		ShowCursor(false);
+
 		return 0;
 	}
 	return DefWindowProc(hWnd, msg, wParam, lParam);

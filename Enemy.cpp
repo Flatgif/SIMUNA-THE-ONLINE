@@ -2,6 +2,7 @@
 #include "Bullet.h"
 #include "Engine/Input.h"
 #include "Engine/Model.h"
+#include "Server.h"
 
 //コンストラクタ
 Enemy::Enemy(GameObject* parent)
@@ -72,7 +73,6 @@ void Enemy::Update()
 		XMStoreFloat3(&dir, vDir);
 		pBullet->SetMove(dir);
 	}
-
 }
 
 //描画
