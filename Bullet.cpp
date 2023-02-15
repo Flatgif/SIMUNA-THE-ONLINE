@@ -3,6 +3,8 @@
 #include "Engine/Input.h"
 #include "Engine/Model.h"
 #include "Stage.h"
+#include "Math.h"
+
 //コンストラクタ
 Bullet::Bullet(GameObject* parent)
     :GameObject(parent, "Bullet"), hModel_(-1), move_(XMFLOAT3(0.1f, 0, 0)), bulletLanding_(0.00001f)

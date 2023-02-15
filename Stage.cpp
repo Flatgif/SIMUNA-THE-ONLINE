@@ -65,10 +65,8 @@ void Stage::Draw()
 {
     for (int x = 0; x < MAP_ROW; x++)                               //Wallの出現の処理
     {
-        transform_.position_.x = x;                    //～個マス壁配置
 
         for (int z = 0; z < MAP_COL; z++)                        //Wallの出現の処理
-
         {
             int type = map_[x][z]; //&&どっちも揃ったら マップにブロックの処理
             transform_.position_.x = x;                    //～個マス壁配置

@@ -11,7 +11,7 @@
 
 //コンストラクタ
 Player::Player(GameObject* parent)
-	:GameObject(parent, "Player"), hModel_(-1), camDist_(0), dashSpeed_(0.1f),moveSpeed_(0.5f)
+	:GameObject(parent, "Player"), hModel_(-1), camDist_(0), dashSpeed_(0.1f), moveSpeed_(0.1f)
 {
 }
 
@@ -32,6 +32,7 @@ void Player::Initialize()
 	{
 		hMapModel_[i] = pStage->GetModelHandle(i);
 	}
+	transform_.position_ = pStage->GetPosition();
 }
 
 //更新
@@ -81,7 +82,7 @@ void Player::Update()
 		PlayerSlideMove();
 		break;
 	case dash:
-		
+
 	default:
 		Math::EaseOut(&dashSpeed_, 0.01f, 0.1f);
 		break;
@@ -117,14 +118,14 @@ void Player::PlayerMove()
 	vPos_ += vMove_;
 	vMove_ = XMVectorSet(0, 0, 0, 0);
 	playerstate_ = noMove;
-	
+
 }
 
 void Player::PlayerSlideMove()
 {
 	RayCastData data;
-	
-	if ( IsHit(hMapModel_[1], &data)||IsHit(hMapModel_[2], &data))
+
+	if (IsHit(hMapModel_[1], &data) || IsHit(hMapModel_[2], &data))
 	{
 		vMove_ = ScratchWall(data.normal, vMove_);
 		//vMove_ *= 0;
@@ -137,7 +138,7 @@ void Player::PlayerSlideMove()
 
 }
 
-bool Player::IsHit(int h_model,RayCastData* data)
+bool Player::IsHit(int h_model, RayCastData* data)
 {
 
 	XMVECTOR length = XMVector3Length(vMove_);
@@ -181,8 +182,8 @@ void Player::ViewRotate()
 	XMFLOAT3 mouseMove = Input::GetMouseMove();
 
 	//視点の回転（マウスの移動量）
-	transform_.rotate_.x += mouseMove.y ;
-	transform_.rotate_.y += mouseMove.x ;
+	transform_.rotate_.x += mouseMove.y;
+	transform_.rotate_.y += mouseMove.x;
 	if (transform_.rotate_.x >= 89)
 	{
 		transform_.rotate_.x = 89;
@@ -204,9 +205,9 @@ void Player::ViewRotate()
 
 XMVECTOR Player::ScratchWall(XMVECTOR normal, XMVECTOR pos)
 {
-	XMVECTOR delY = XMVectorSet( 1, 0, 1, 0 );
+	XMVECTOR delY = XMVectorSet(1, 0, 1, 0);
 	normal = XMVector3Normalize(normal);
-	XMVECTOR result =pos - XMVector3Dot(pos, normal) * normal;
+	XMVECTOR result = pos - XMVector3Dot(pos, normal) * normal;
 	result *= delY;
 	return result;
 
@@ -228,3 +229,4 @@ void Player::shoot()
 	pBullet->SetMove(camPos);
 
 }
+

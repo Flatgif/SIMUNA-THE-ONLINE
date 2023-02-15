@@ -24,3 +24,7 @@ float Math::EaseOut(float* speed, float acceleration, float min)
 
 }
 
+XMVECTOR Math::Normal(XMVECTOR dir)
+{
+	return (dir - (2 * dir));
+}
